@@ -1,0 +1,190 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id                String         @id @default(cuid())
+  email             String         @unique
+  password          String
+  role              String
+  created_at        DateTime       @default(now())
+  corp_profile      CorpProfile?
+  notifications     Notification[]
+  referral_received ReferralLog?   @relation("ReferralNewUser")
+  talent_profile    TalentProfile?
+}
+
+model TalentProfile {
+  id                 String          @id @default(cuid())
+  user_id            String          @unique
+  username           String
+  specialty          String          @default("")
+  contact_info       String          @default("")
+  website_url        String          @default("")
+  capability_modules String          @default("[]")
+  tool_stack         String          @default("[]")
+  delivery_pref      String          @default("result_bet")
+  avg_score          Float           @default(0)
+  collab_count       Int             @default(0)
+  bio                String          @default("")
+  is_student         Boolean         @default(false)
+  edu_email          String          @default("")
+  student_metadata   String          @default("{}")
+  tags               String          @default("[]")
+  created_at         DateTime        @default(now())
+  collaborations     Collaboration[]
+  portfolio_cases    PortfolioCase[]
+  submissions        Submission[]
+  user               User            @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model CorpProfile {
+  id                String            @id @default(cuid())
+  user_id           String            @unique
+  company_name      String
+  company_desc      String            @default("")
+  website_url       String            @default("")
+  contact_name      String            @default("")
+  contact_info      String            @default("")
+  business_tracks   String            @default("[]")
+  is_verified       Boolean           @default(false)
+  invite_quota      Int               @default(3)
+  referral_bonus    Int               @default(0)
+  quota_reset_at    DateTime          @default(now())
+  referral_code     String?           @unique
+  created_at        DateTime          @default(now())
+  company_size      String            @default("startup")
+  collaborations    Collaboration[]
+  user              User              @relation(fields: [user_id], references: [id], onDelete: Cascade)
+  diagnosis_records DiagnosisRecord[]
+  referral_logs     ReferralLog[]     @relation("ReferralGiven")
+  requirements      Requirement[]
+}
+
+model ReferralLog {
+  id          String      @id @default(cuid())
+  referrer_id String
+  new_user_id String      @unique
+  created_at  DateTime    @default(now())
+  new_user    User        @relation("ReferralNewUser", fields: [new_user_id], references: [id], onDelete: Cascade)
+  referrer    CorpProfile @relation("ReferralGiven", fields: [referrer_id], references: [id], onDelete: Cascade)
+}
+
+model DiagnosisRecord {
+  id             String      @id @default(cuid())
+  corp_id        String
+  business_input String
+  diagnosis_text String      @default("")
+  result_json    String      @default("{}")
+  created_at     DateTime    @default(now())
+  corp_profile   CorpProfile @relation(fields: [corp_id], references: [id], onDelete: Cascade)
+}
+
+model Requirement {
+  id                 String          @id @default(cuid())
+  corp_id            String
+  title              String
+  intent_desc        String
+  ai_tags            String          @default("[]")
+  business_stage     String          @default("startup")
+  complexity         String          @default("mid")
+  budget_min         Float?
+  budget_max         Float?
+  currency           String          @default("CNY")
+  deadline           DateTime?
+  question_types     String          @default("[]")
+  capability_weights String          @default("{}")
+  req_modules        String          @default("[]")
+  status             String          @default("draft")
+  created_at         DateTime        @default(now())
+  collaborations     Collaboration[]
+  exam_questions     ExamQuestion[]
+  corp_profile       CorpProfile     @relation(fields: [corp_id], references: [id], onDelete: Cascade)
+  submissions        Submission[]
+}
+
+model ExamQuestion {
+  id             String      @id @default(cuid())
+  requirement_id String
+  seq            Int
+  title          String
+  description    String
+  weight         Int
+  requirement    Requirement @relation(fields: [requirement_id], references: [id], onDelete: Cascade)
+}
+
+model Submission {
+  id                 String         @id @default(cuid())
+  requirement_id     String
+  talent_id          String
+  answers            String         @default("{}")
+  conversation_log   String         @default("[]")
+  status             String         @default("pending")
+  read_by_corp       Boolean        @default(false)
+  ai_total_score     Float?
+  ai_score_breakdown String?
+  ai_diagnosis       String?
+  submitted_at       DateTime       @default(now())
+  collaboration      Collaboration?
+  talent_profile     TalentProfile  @relation(fields: [talent_id], references: [id], onDelete: Cascade)
+  requirement        Requirement    @relation(fields: [requirement_id], references: [id], onDelete: Cascade)
+}
+
+model Collaboration {
+  id                        String        @id @default(cuid())
+  type                      String        @default("collaboration")
+  requirement_id            String
+  submission_id             String?       @unique
+  talent_id                 String
+  corp_id                   String
+  status                    String        @default("invited")
+  invitation_message        String?
+  is_read                   Boolean       @default(false)
+  unread_for_corp           Boolean       @default(false)
+  unread_for_talent         Boolean       @default(false)
+  corp_confirmed_complete   Boolean       @default(false)
+  talent_confirmed_complete Boolean       @default(false)
+  corp_star_rating          Int?
+  created_at                DateTime      @default(now())
+  corp_profile              CorpProfile   @relation(fields: [corp_id], references: [id])
+  talent_profile            TalentProfile @relation(fields: [talent_id], references: [id])
+  submission                Submission?   @relation(fields: [submission_id], references: [id])
+  requirement               Requirement   @relation(fields: [requirement_id], references: [id])
+  messages                  Message[]
+}
+
+model Message {
+  id               String        @id @default(cuid())
+  collaboration_id String
+  sender_id        String
+  sender_role      String
+  content          String
+  sent_at          DateTime      @default(now())
+  collaboration    Collaboration @relation(fields: [collaboration_id], references: [id], onDelete: Cascade)
+}
+
+model Notification {
+  id         String   @id @default(cuid())
+  user_id    String
+  type       String
+  payload    String   @default("{}")
+  is_read    Boolean  @default(false)
+  created_at DateTime @default(now())
+  user       User     @relation(fields: [user_id], references: [id], onDelete: Cascade)
+}
+
+model PortfolioCase {
+  id          String        @id @default(cuid())
+  talent_id   String
+  title       String
+  description String        @default("")
+  images      String        @default("[]")
+  files       String        @default("[]")
+  created_at  DateTime      @default(now())
+  talent      TalentProfile @relation(fields: [talent_id], references: [id], onDelete: Cascade)
+}

@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Market Banner Mockup — OPC x AI</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: -apple-system, "Inter", "PingFang SC", sans-serif;
+    background: #f1f5f9;
+    color: #1e293b;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Page shell ── */
+  .page {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 32px 24px 80px;
+  }
+
+  /* ── Top nav stub ── */
+  .nav {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 28px;
+  }
+  .nav-logo {
+    font-size: 18px;
+    font-weight: 800;
+    color: #4f46e5;
+    letter-spacing: -0.5px;
+  }
+  .nav-logo span { color: #1e293b; }
+  .nav-links {
+    display: flex;
+    gap: 24px;
+    font-size: 13px;
+    color: #64748b;
+  }
+  .nav-links a { color: #4f46e5; font-weight: 600; text-decoration: none; }
+
+  /* ── Section header ── */
+  .section-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+  }
+  .section-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #475569;
+    letter-spacing: 0.2px;
+  }
+  .section-title .badge-fire { font-size: 15px; }
+  .section-privacy {
+    font-size: 11px;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .section-privacy svg { opacity: 0.6; }
+
+  /* ── Banner wrapper ── */
+  .banner-wrap {
+    background: linear-gradient(135deg, #eef2ff 0%, #f8fafc 60%, #f0fdf4 100%);
+    border: 1px solid #e2e8f0;
+    border-radius: 20px;
+    padding: 20px 20px 18px;
+    margin-bottom: 20px;
+    position: relative;
+    overflow: hidden;
+  }
+  /* subtle texture */
+  .banner-wrap::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background-image: radial-gradient(circle at 10% 20%, rgba(99,102,241,0.05) 0%, transparent 50%),
+                      radial-gradient(circle at 90% 80%, rgba(16,185,129,0.04) 0%, transparent 50%);
+    pointer-events: none;
+  }
+
+  /* ── Carousel track ── */
+  .carousel-outer {
+    overflow: hidden;
+    position: relative;
+  }
+  .carousel-track {
+    display: flex;
+    gap: 14px;
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    will-change: transform;
+  }
+
+  /* ── Card ── */
+  .card {
+    flex: 0 0 calc((100% - 28px) / 3);
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 16px 18px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 11px;
+    transition: box-shadow 0.18s, transform 0.18s;
+    cursor: default;
+    position: relative;
+    overflow: hidden;
+  }
+  .card:hover {
+    box-shadow: 0 8px 24px rgba(99,102,241,0.10), 0 2px 6px rgba(0,0,0,0.04);
+    transform: translateY(-2px);
+  }
+
+  /* card top accent line */
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, #6366f1, #818cf8);
+    border-radius: 14px 14px 0 0;
+  }
+
+  /* ── Card: status row ── */
+  .card-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .badge-done {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 10.5px;
+    font-weight: 700;
+    color: #059669;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    padding: 2px 8px;
+    border-radius: 20px;
+    letter-spacing: 0.2px;
+  }
+  .badge-done-dot {
+    width: 5px; height: 5px;
+    background: #10b981;
+    border-radius: 50%;
+  }
+  .card-meta-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-time {
+    font-size: 10.5px;
+    color: #94a3b8;
+  }
+  .stars {
+    font-size: 11px;
+    letter-spacing: 1px;
+    color: #f59e0b;
+  }
+
+  /* ── Card: body ── */
+  .card-corp {
+    font-size: 10.5px;
+    color: #94a3b8;
+    font-weight: 500;
+    margin-bottom: -6px;
+  }
+  .card-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #1e293b;
+    line-height: 1.45;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  /* ── Card: tags ── */
+  .card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+  }
+  .tag {
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 2px 8px;
+    border-radius: 6px;
+    white-space: nowrap;
+  }
+  .tag-cap {
+    background: #eef2ff;
+    color: #4f46e5;
+    border: 1px solid #c7d2fe;
+  }
+  .tag-stage {
+    background: #f8fafc;
+    color: #64748b;
+    border: 1px solid #e2e8f0;
+  }
+  .tag-complexity-mid {
+    background: #fffbeb;
+    color: #b45309;
+    border: 1px solid #fde68a;
+  }
+  .tag-complexity-high {
+    background: #fff1f2;
+    color: #be123c;
+    border: 1px solid #fecdd3;
+  }
+  .tag-complexity-low {
+    background: #f0fdf4;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+  }
+  .tag-budget {
+    background: #f0fdf4;
+    color: #15803d;
+    border: 1px solid #bbf7d0;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+  }
+
+  /* ── Card: executor ── */
+  .card-executor {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding-top: 8px;
+    border-top: 1px solid #f1f5f9;
+  }
+  .executor-avatar {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    color: white;
+    font-weight: 700;
+    flex-shrink: 0;
+  }
+  .executor-avatar.amber {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+  }
+  .executor-info {
+    flex: 1;
+    min-width: 0;
+  }
+  .executor-label {
+    font-size: 10px;
+    color: #94a3b8;
+  }
+  .executor-name {
+    font-size: 11.5px;
+    font-weight: 600;
+    color: #475569;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .executor-type {
+    font-size: 9.5px;
+    color: #a5b4fc;
+    font-weight: 600;
+  }
+  .executor-type.amber { color: #fbbf24; }
+
+  /* ── CTA button ── */
+  .card-cta {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #4f46e5;
+    background: #eef2ff;
+    border: 1px solid #c7d2fe;
+    border-radius: 8px;
+    padding: 5px 10px;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+    white-space: nowrap;
+    flex-shrink: 0;
+    text-decoration: none;
+  }
+  .card-cta:hover {
+    background: #4f46e5;
+    color: #fff;
+    border-color: #4f46e5;
+  }
+  .card-cta svg { transition: transform 0.15s; }
+  .card-cta:hover svg { transform: translateX(2px); }
+
+  /* ── Carousel controls ── */
+  .carousel-controls {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+    margin-top: 14px;
+  }
+  .ctrl-btn {
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    border: 1px solid #e2e8f0;
+    background: white;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    color: #64748b;
+    transition: all 0.15s;
+    flex-shrink: 0;
+  }
+  .ctrl-btn:hover {
+    border-color: #6366f1;
+    color: #4f46e5;
+    background: #eef2ff;
+  }
+  .ctrl-btn:disabled {
+    opacity: 0.35;
+    cursor: default;
+  }
+  .dots {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+  .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: #cbd5e1;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+    padding: 0;
+  }
+  .dot.active {
+    background: #6366f1;
+    width: 18px;
+    border-radius: 3px;
+  }
+
+  /* ── Divider ── */
+  .divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    color: #94a3b8;
+    font-size: 12px;
+  }
+  .divider::before, .divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e2e8f0;
+  }
+
+  /* ── Search bar stub ── */
+  .search-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+  }
+  .search-input {
+    flex: 1;
+    height: 42px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: white;
+    padding: 0 16px 0 40px;
+    font-size: 13.5px;
+    color: #1e293b;
+    outline: none;
+    position: relative;
+  }
+  .search-wrap {
+    flex: 1;
+    position: relative;
+  }
+  .search-icon {
+    position: absolute;
+    left: 13px; top: 50%;
+    transform: translateY(-50%);
+    color: #94a3b8;
+    pointer-events: none;
+  }
+  .filter-chip {
+    height: 42px;
+    padding: 0 16px;
+    border: 1px solid #e2e8f0;
+    border-radius: 12px;
+    background: white;
+    font-size: 13px;
+    color: #64748b;
+    cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+    font-family: inherit;
+  }
+  .filter-chip.active {
+    background: #eef2ff;
+    border-color: #c7d2fe;
+    color: #4f46e5;
+    font-weight: 600;
+  }
+
+  /* ── Talent grid stub ── */
+  .grid-label {
+    font-size: 12px;
+    color: #94a3b8;
+    margin-bottom: 12px;
+  }
+  .talent-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 14px;
+  }
+  .talent-card-stub {
+    background: white;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    height: 140px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #cbd5e1;
+    font-size: 12px;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .talent-card-stub svg { opacity: 0.3; }
+
+  /* ── Pre-fill toast (appears on CTA click) ── */
+  .toast {
+    position: fixed;
+    bottom: 32px;
+    left: 50%;
+    transform: translateX(-50%) translateY(12px);
+    background: #1e293b;
+    color: white;
+    font-size: 13px;
+    padding: 12px 20px;
+    border-radius: 12px;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.2);
+    opacity: 0;
+    transition: opacity 0.25s, transform 0.25s;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 999;
+  }
+  .toast.show {
+    opacity: 1;
+    transform: translateX(-50%) translateY(0);
+  }
+  .toast strong { color: #a5b4fc; }
+
+  /* ── Annotation labels (mockup only) ── */
+  .anno {
+    position: absolute;
+    background: #fef08a;
+    border: 1px solid #fbbf24;
+    color: #78350f;
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: 5px;
+    pointer-events: none;
+    z-index: 10;
+    white-space: nowrap;
+  }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <!-- nav stub -->
+  <nav class="nav">
+    <div class="nav-logo">OPC<span>x AI</span></div>
+    <div class="nav-links">
+      <span>市场</span>
+      <span>需求</span>
+      <span>协作</span>
+      <a href="#">张总 ▾</a>
+    </div>
+  </nav>
+
+  <!-- ════════════════════════════════════════════
+       BANNER MODULE — 这是新增的模块
+  ════════════════════════════════════════════ -->
+
+  <div class="section-header">
+    <div class="section-title">
+      <span class="badge-fire">🔥</span>
+      近期热门合作案例
+    </div>
+    <div class="section-privacy">
+      <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m0 0v2m0-2h2m-2 0H10m11-7a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4"/>
+      </svg>
+      信息已脱敏处理，保护双方隐私
+    </div>
+  </div>
+
+  <div class="banner-wrap" id="bannerWrap">
+    <div class="carousel-outer">
+      <div class="carousel-track" id="track">
+
+        <!-- Card 1 -->
+        <div class="card">
+          <div class="card-status">
+            <span class="badge-done"><span class="badge-done-dot"></span>已完成</span>
+            <div class="card-meta-right">
+              <span class="card-time">近 14 天</span>
+              <span class="stars">★★★★★</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-corp">某出海消费品品牌</div>
+            <div class="card-title">TikTok 内容矩阵搭建 + AI 数字人短视频批量生产</div>
+          </div>
+          <div class="card-tags">
+            <span class="tag tag-cap">🎬 短视频与数字人</span>
+            <span class="tag tag-cap">🌍 全球化品牌</span>
+            <span class="tag tag-complexity-high">高复杂度</span>
+            <span class="tag tag-stage">成长期</span>
+            <span class="tag tag-budget">💰 ¥1w–5w</span>
+          </div>
+          <div class="card-executor">
+            <div class="executor-avatar">T</div>
+            <div class="executor-info">
+              <div class="executor-label">执行方</div>
+              <div class="executor-name">TikTok 出海运营专家</div>
+            </div>
+            <span class="executor-type">个人 OPC</span>
+            <a class="card-cta" href="#" onclick="showToast('TikTok 内容矩阵搭建', ['短视频与数字人', '全球化品牌'], '成长期', '高复杂度'); return false;">
+              发布相似需求
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Card 2 -->
+        <div class="card">
+          <div class="card-status">
+            <span class="badge-done"><span class="badge-done-dot"></span>已完成</span>
+            <div class="card-meta-right">
+              <span class="card-time">近 7 天</span>
+              <span class="stars">★★★★★</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-corp">某 SaaS 初创企业</div>
+            <div class="card-title">AI 产品原型设计 + MVP 交互原型开发（Claude API 接入）</div>
+          </div>
+          <div class="card-tags">
+            <span class="tag tag-cap">🔧 AI产品原型</span>
+            <span class="tag tag-cap">🤖 AI工作流</span>
+            <span class="tag tag-complexity-high">高复杂度</span>
+            <span class="tag tag-stage">初创期</span>
+            <span class="tag tag-budget">💰 ¥5k–1w</span>
+          </div>
+          <div class="card-executor">
+            <div class="executor-avatar">P</div>
+            <div class="executor-info">
+              <div class="executor-label">执行方</div>
+              <div class="executor-name">AI 产品 &amp; 全栈开发专家</div>
+            </div>
+            <span class="executor-type">个人 OPC</span>
+            <a class="card-cta" href="#" onclick="showToast('AI 产品原型开发', ['AI产品原型', 'AI工作流'], '初创期', '高复杂度'); return false;">
+              发布相似需求
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Card 3 -->
+        <div class="card">
+          <div class="card-status">
+            <span class="badge-done"><span class="badge-done-dot"></span>已完成</span>
+            <div class="card-meta-right">
+              <span class="card-time">近 21 天</span>
+              <span class="stars">★★★★☆</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-corp">某跨境电商企业</div>
+            <div class="card-title">全平台 AI 内容本地化策略 + 多语言 AIGC 内容生产体系</div>
+          </div>
+          <div class="card-tags">
+            <span class="tag tag-cap">📝 AIGC全媒介</span>
+            <span class="tag tag-cap">🌍 全球化品牌</span>
+            <span class="tag tag-complexity-mid">中等复杂度</span>
+            <span class="tag tag-stage">成长期</span>
+            <span class="tag tag-budget">💰 ¥1w–5w</span>
+          </div>
+          <div class="card-executor">
+            <div class="executor-avatar amber">E</div>
+            <div class="executor-info">
+              <div class="executor-label">执行方</div>
+              <div class="executor-name">多语言内容 &amp; 品牌出海团队</div>
+            </div>
+            <span class="executor-type amber">机构 OPC</span>
+            <a class="card-cta" href="#" onclick="showToast('AIGC 内容本地化', ['AIGC全媒介', '全球化品牌'], '成长期', '中等复杂度'); return false;">
+              发布相似需求
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Card 4 -->
+        <div class="card">
+          <div class="card-status">
+            <span class="badge-done"><span class="badge-done-dot"></span>已完成</span>
+            <div class="card-meta-right">
+              <span class="card-time">近 30 天</span>
+              <span class="stars">★★★★★</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-corp">某智能制造企业</div>
+            <div class="card-title">销售数据自动化看板 + AI 业务洞察报告体系搭建</div>
+          </div>
+          <div class="card-tags">
+            <span class="tag tag-cap">📊 智能决策</span>
+            <span class="tag tag-cap">🤖 AI工作流</span>
+            <span class="tag tag-complexity-mid">中等复杂度</span>
+            <span class="tag tag-stage">规模期</span>
+            <span class="tag tag-budget">💰 ¥5k–2w</span>
+          </div>
+          <div class="card-executor">
+            <div class="executor-avatar" style="background: linear-gradient(135deg, #0ea5e9, #6366f1);">D</div>
+            <div class="executor-info">
+              <div class="executor-label">执行方</div>
+              <div class="executor-name">数据分析 &amp; BI 自动化专家</div>
+            </div>
+            <span class="executor-type">个人 OPC</span>
+            <a class="card-cta" href="#" onclick="showToast('数据看板 & 业务洞察', ['智能决策', 'AI工作流'], '规模期', '中等复杂度'); return false;">
+              发布相似需求
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Card 5 -->
+        <div class="card">
+          <div class="card-status">
+            <span class="badge-done"><span class="badge-done-dot"></span>已完成</span>
+            <div class="card-meta-right">
+              <span class="card-time">近 10 天</span>
+              <span class="stars">★★★★★</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-corp">某新消费品牌</div>
+            <div class="card-title">私域 AI 增长体系搭建 + 企微自动化获客工作流</div>
+          </div>
+          <div class="card-tags">
+            <span class="tag tag-cap">📈 AI驱动增长</span>
+            <span class="tag tag-cap">🤖 AI工作流</span>
+            <span class="tag tag-complexity-mid">中等复杂度</span>
+            <span class="tag tag-stage">成长期</span>
+            <span class="tag tag-budget">💰 ¥1w–3w</span>
+          </div>
+          <div class="card-executor">
+            <div class="executor-avatar" style="background: linear-gradient(135deg, #10b981, #6366f1);">G</div>
+            <div class="executor-info">
+              <div class="executor-label">执行方</div>
+              <div class="executor-name">私域增长 &amp; 自动化专家</div>
+            </div>
+            <span class="executor-type">个人 OPC</span>
+            <a class="card-cta" href="#" onclick="showToast('私域增长自动化', ['AI驱动增长', 'AI工作流'], '成长期', '中等复杂度'); return false;">
+              发布相似需求
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+        <!-- Card 6 -->
+        <div class="card">
+          <div class="card-status">
+            <span class="badge-done"><span class="badge-done-dot"></span>已完成</span>
+            <div class="card-meta-right">
+              <span class="card-time">近 25 天</span>
+              <span class="stars">★★★★☆</span>
+            </div>
+          </div>
+          <div>
+            <div class="card-corp">某教育科技企业</div>
+            <div class="card-title">AI 课程内容工厂搭建 + 多模态 AIGC 教辅素材生产线</div>
+          </div>
+          <div class="card-tags">
+            <span class="tag tag-cap">📝 AIGC全媒介</span>
+            <span class="tag tag-cap">🔧 AI产品原型</span>
+            <span class="tag tag-complexity-high">高复杂度</span>
+            <span class="tag tag-stage">成长期</span>
+            <span class="tag tag-budget">💰 ¥2w+</span>
+          </div>
+          <div class="card-executor">
+            <div class="executor-avatar amber">T</div>
+            <div class="executor-info">
+              <div class="executor-label">执行方</div>
+              <div class="executor-name">AI 教育内容创作团队</div>
+            </div>
+            <span class="executor-type amber">机构 OPC</span>
+            <a class="card-cta" href="#" onclick="showToast('AI 课程内容生产', ['AIGC全媒介', 'AI产品原型'], '成长期', '高复杂度'); return false;">
+              发布相似需求
+              <svg width="12" height="12" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3"/>
+              </svg>
+            </a>
+          </div>
+        </div>
+
+      </div><!-- /track -->
+    </div><!-- /outer -->
+
+    <!-- Controls -->
+    <div class="carousel-controls">
+      <button class="ctrl-btn" id="prevBtn" onclick="move(-1)">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5"/>
+        </svg>
+      </button>
+      <div class="dots" id="dots"></div>
+      <button class="ctrl-btn" id="nextBtn" onclick="move(1)">
+        <svg width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.5">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+  <!-- /banner-wrap -->
+
+  <!-- ════════════════════════════════════════
+       EXISTING CONTENT (stub)
+  ════════════════════════════════════════ -->
+
+  <div class="divider">人才市场</div>
+
+  <div class="search-row">
+    <div class="search-wrap">
+      <svg class="search-icon" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/><path stroke-linecap="round" d="M21 21l-4.35-4.35"/>
+      </svg>
+      <input class="search-input" placeholder="搜索人才姓名、技能方向…" />
+    </div>
+    <button class="filter-chip">全部类型 ▾</button>
+    <button class="filter-chip active">🔧 AI产品原型</button>
+    <button class="filter-chip">🌍 出海品牌</button>
+    <button class="filter-chip">更多筛选 ▾</button>
+  </div>
+
+  <div class="grid-label">共找到 24 位人才</div>
+  <div class="talent-grid">
+    <div class="talent-card-stub">
+      <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="8" r="4"/><path stroke-linecap="round" d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+      </svg>
+      人才卡片
+    </div>
+    <div class="talent-card-stub">
+      <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="8" r="4"/><path stroke-linecap="round" d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+      </svg>
+      人才卡片
+    </div>
+    <div class="talent-card-stub">
+      <svg width="28" height="28" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+        <circle cx="12" cy="8" fill="none" r="4"/><path stroke-linecap="round" d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/>
+      </svg>
+      人才卡片
+    </div>
+  </div>
+
+</div><!-- /page -->
+
+<!-- Pre-fill toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+  // ── Carousel logic ──────────────────────────────────────────────────
+  const track     = document.getElementById('track');
+  const dotsEl    = document.getElementById('dots');
+  const prevBtn   = document.getElementById('prevBtn');
+  const nextBtn   = document.getElementById('nextBtn');
+  const bannerWrap = document.getElementById('bannerWrap');
+
+  const CARDS_VISIBLE = 3;
+  const cards = track.querySelectorAll('.card');
+  const total = cards.length;
+  const maxIndex = total - CARDS_VISIBLE; // 0..3 for 6 cards, 3 visible
+
+  let current = 0;
+  let autoTimer = null;
+  let paused = false;
+
+  // Build dots (one per "page", i.e. maxIndex+1 positions)
+  for (let i = 0; i <= maxIndex; i++) {
+    const d = document.createElement('button');
+    d.className = 'dot' + (i === 0 ? ' active' : '');
+    d.addEventListener('click', () => goTo(i));
+    dotsEl.appendChild(d);
+  }
+
+  function getCardWidth() {
+    // card width + gap (14px)
+    return cards[0].getBoundingClientRect().width + 14;
+  }
+
+  function goTo(idx) {
+    current = Math.max(0, Math.min(idx, maxIndex));
+    track.style.transform = `translateX(-${current * getCardWidth()}px)`;
+    dotsEl.querySelectorAll('.dot').forEach((d, i) => {
+      d.classList.toggle('active', i === current);
+    });
+    prevBtn.disabled = current === 0;
+    nextBtn.disabled = current === maxIndex;
+  }
+
+  function move(dir) {
+    goTo(current + dir);
+    resetAuto();
+  }
+
+  function startAuto() {
+    autoTimer = setInterval(() => {
+      if (paused) return;
+      goTo(current < maxIndex ? current + 1 : 0);
+    }, 4000);
+  }
+
+  function resetAuto() {
+    clearInterval(autoTimer);
+    startAuto();
+  }
+
+  // Pause on hover
+  bannerWrap.addEventListener('mouseenter', () => paused = true);
+  bannerWrap.addEventListener('mouseleave', () => paused = false);
+
+  // Init
+  goTo(0);
+  startAuto();
+
+  // ── CTA toast ───────────────────────────────────────────────────────
+  function showToast(title, caps, stage, complexity) {
+    const t = document.getElementById('toast');
+    t.innerHTML = `预填完成 → <strong>${title}</strong>  ·  ${caps.join(' / ')}  ·  ${stage}  ·  ${complexity}`;
+    t.classList.add('show');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 3200);
+  }
+</script>
+</body>
+</html>

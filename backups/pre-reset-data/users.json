@@ -1,0 +1,10 @@
+[{"id":"cmm52i7h50000j4mfg0yex16r","email":"test@corp.com","password":"$2b$12$7QS81YWYMT8HxjBI.FXVhu.c0M8ZlwgZFk.tjerPSlYmHzg75wB7.","role":"corp","created_at":1772207361113},
+{"id":"cmm52id4u0002j4mfo6e0wdcc","email":"test@talent.com","password":"$2b$12$fzjLJcDDhmg2U2X/HQXh8uLDF5pZ8R/0L7dfk.580v2QBKy3UEGp6","role":"talent","created_at":1772207368446},
+{"id":"cmm52j0wh0004j4mfz6i0yb3p","email":"shanshanhe0722@gmail.com","password":"$2b$12$ZdxvB.cjDaZczDRnLbzxgOvEVaKDhngr4qyAFtcMXDLCCjesdbx16","role":"corp","created_at":1772207399249},
+{"id":"cmm52qsva000bj4mfth8gmsbb","email":"shanshanhe@gmail.com","password":"$2b$12$xQBA0J2EJWq85UPcWXl1F.waJTqX2/mcqymnl16o5M/RdUonoMv8e","role":"talent","created_at":1772207762087},
+{"id":"cmm8w9sen000n138mngmt55dx","email":"dewtarot@gmail.com","password":"$2b$12$MqrOxkzwjlGrme66GQ5pL.4a9zW8bJBqwrAuMrSJdSPWl75HdpstW","role":"corp","created_at":1772438755343},
+{"id":"cmm8wbf5i000p138mi9uykba0","email":"2324@163.com","password":"$2b$12$SyQ7D/eFVANJfq59tLsnYOeB5s3iGQzkhBqt3VRx31ttyvCzXnKQ.","role":"talent","created_at":1772438831478},
+{"id":"cmm910047000z138ms5qvvmxf","email":"dewtaro3t@gmail.com","password":"$2b$12$GiIYgaTi9em160u.0Z2GQORYDm9xL6rpS2Mdqo2wXZID/IJxiL8Pq","role":"talent","created_at":1772446696855},
+{"id":"cmm92oie60011138mtla1kn9x","email":"dewtar2342ot@gmail.com","password":"$2b$12$59emXEq8edUuuIQ/O6DZqerYKieX8u.6mZ7ztWxN9VBhkA1pCrHz.","role":"talent","created_at":1772449519902},
+{"id":"cmm97dlsu0013138molvhjxts","email":"23431@163.com","password":"$2b$12$tKFZ7sqx1M3dF/dttJgWA..YRY7wRz97jnayc0D0XqyxX.PL.wy2O","role":"talent","created_at":1772457409182},
+{"id":"cmmaekq7p0034138mo17rleyl","email":"hss@163.com","password":"$2b$12$ujHUyMQFdtGUfoHOydqspOQHFZRyvXZR9bWurPO5.CrsBhPGrOqIu","role":"talent","created_at":1772529964982}]
