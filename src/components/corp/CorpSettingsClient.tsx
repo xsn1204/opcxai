@@ -93,7 +93,7 @@ export function CorpSettingsClient({
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-8 py-10">
+    <div className="max-w-2xl mx-auto px-4 sm:px-8 py-6 sm:py-10">
       {/* Header */}
       <div className="mb-8">
         <h1 className="text-2xl font-bold text-slate-800">企业设置</h1>

@@ -31,22 +31,43 @@ export default async function CorpMarketPage() {
       : null,
   ]);
 
-  const [requirements, assessmentInvitations] = corpProfile
+  const [requirements, assessmentInvitations, existingSubmissions] = corpProfile
     ? await Promise.all([
         prisma.requirement.findMany({
           where: { corp_id: corpProfile.id, status: { in: ["draft", "active"] } },
           select: { id: true, title: true, status: true, question_types: true },
           orderBy: { created_at: "desc" },
         }),
+        // All assessment/no_exam_intent collabs regardless of status — any prior contact blocks re-invite
         prisma.collaboration.findMany({
-          where: { corp_id: corpProfile.id, type: { in: ["assessment", "no_exam_intent"] }, status: "invited" },
+          where: { corp_id: corpProfile.id, type: { in: ["assessment", "no_exam_intent"] } },
+          select: { talent_id: true, requirement_id: true, invitation_message: true },
+        }),
+        // Talents who already submitted for the corp's requirements (self-initiated or post-invite)
+        prisma.submission.findMany({
+          where: { requirement: { corp_id: corpProfile.id } },
           select: { talent_id: true, requirement_id: true },
         }),
       ])
-    : [[], []];
+    : [[], [], []];
 
-  const invitedPairs = (assessmentInvitations as { talent_id: string; requirement_id: string }[])
+  type CollabRow = { talent_id: string; requirement_id: string; invitation_message: string | null };
+  const collabs = assessmentInvitations as CollabRow[];
+
+  // Corp-initiated invites (invitation_message: null) → "✓ 已邀请"
+  const corpInvitedPairs = collabs
+    .filter((c) => c.invitation_message === null)
     .map((c) => `${c.talent_id}:${c.requirement_id}`);
+
+  // Talent-initiated intents (invitation_message: not null) → "✓ OPC 已发意向"
+  const talentIntentPairs = collabs
+    .filter((c) => c.invitation_message !== null)
+    .map((c) => `${c.talent_id}:${c.requirement_id}`);
+
+  const submittedPairs = new Set(
+    (existingSubmissions as { talent_id: string; requirement_id: string }[])
+      .map((s) => `${s.talent_id}:${s.requirement_id}`)
+  );
 
   const moduleLabels = Object.fromEntries(
     CAPABILITY_MODULES.map((m) => [m.id, { label: m.label, icon: m.icon }])
@@ -57,7 +78,9 @@ export default async function CorpMarketPage() {
       talents={talents}
       requirements={requirements}
       moduleLabels={moduleLabels}
-      invitedPairs={invitedPairs}
+      invitedPairs={corpInvitedPairs}
+      talentIntentPairs={talentIntentPairs}
+      submittedPairs={[...submittedPairs]}
     />
   );
 }

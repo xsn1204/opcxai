@@ -51,7 +51,7 @@ export function ChallengesClient({ requirements }: Props) {
   return (
     <>
           {/* Exam mode filter */}
-      <div className="flex gap-1 mb-3">
+      <div className="flex flex-wrap gap-1 mb-3">
       
         <button onClick={() => setActiveMode(activeMode === "结果交付式" ? null : "结果交付式")} className={modeChipClass("结果交付式")}>
           结果交付式
@@ -185,7 +185,7 @@ export function ChallengesClient({ requirements }: Props) {
         })}
 
         {!filtered.length && (
-          <div className="col-span-3 text-center py-20 text-slate-600">
+          <div className="col-span-full text-center py-20 text-slate-600">
             <p className="text-4xl mb-4">📭</p>
             <p className="text-lg mb-1">暂无匹配挑战</p>
             <p className="text-sm">{(activeModule || activeMode) ? "尝试调整筛选条件" : "企业发布需求后将在此显示"}</p>

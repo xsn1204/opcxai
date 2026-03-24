@@ -64,13 +64,11 @@ interface ExamQuestion {
 export default function CorpNewRequirementPage() {
   const router = useRouter();
   const [step, setStep] = useState<FormStep>(1);
-  const [savingStep2, setSavingStep2] = useState(false);
   const [publishing, setPublishing] = useState(false);
   const [error, setError] = useState("");
 
-  // Clear all loading states on mount to avoid stale state from prior navigation
+  // Clear loading states on mount to avoid stale state from prior navigation
   useEffect(() => {
-    setSavingStep2(false);
     setPublishing(false);
     setGeneratingQuestions(false);
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -82,6 +80,7 @@ export default function CorpNewRequirementPage() {
   const [reqModules, setReqModules] = useState<string[]>([]);
   const [budgetMin, setBudgetMin] = useState("");
   const [budgetMax, setBudgetMax] = useState("");
+  const [budgetNegotiable, setBudgetNegotiable] = useState(false);
   const [deadline, setDeadline] = useState("");
 
   // Step 2 — Smart Recommendation
@@ -108,7 +107,6 @@ export default function CorpNewRequirementPage() {
   const [newKeyPoint, setNewKeyPoint] = useState("");
 
   // Step 4 — Questions
-  const [requirementId, setRequirementId] = useState<string | null>(null);
   const [questions, setQuestions] = useState<ExamQuestion[]>([]);
   const [generatingQuestions, setGeneratingQuestions] = useState(false);
   const [polishingTask, setPolishingTask] = useState(false);
@@ -157,17 +155,19 @@ export default function CorpNewRequirementPage() {
       setError("请填写交付截止日期");
       return;
     }
-    if (!budgetMin || !budgetMax) {
-      setError("请填写项目预算范围（最低与最高）");
-      return;
-    }
-    if (Number(budgetMin) <= 0 || Number(budgetMax) <= 0) {
-      setError("项目预算必须为正数");
-      return;
-    }
-    if (Number(budgetMin) > Number(budgetMax)) {
-      setError("预算最低值不能大于最高值");
-      return;
+    if (!budgetNegotiable) {
+      if (!budgetMin || !budgetMax) {
+        setError("请填写项目预算范围（最低与最高）");
+        return;
+      }
+      if (Number(budgetMin) <= 0 || Number(budgetMax) <= 0) {
+        setError("项目预算必须为正数");
+        return;
+      }
+      if (Number(budgetMin) > Number(budgetMax)) {
+        setError("预算最低值不能大于最高值");
+        return;
+      }
     }
     setError("");
     setStep(2);
@@ -214,13 +214,18 @@ export default function CorpNewRequirementPage() {
     setAnalyzing(false);
   }
 
-  // ── Step 2 submit → create requirement ──
-  async function handleStep3(e: React.FormEvent) {
+  // ── Step 2 submit → move to step 3, generate questions client-side ──
+  function handleStep3(e: React.FormEvent) {
     e.preventDefault();
     setError("");
-    setSavingStep2(true);
+    setStep(3);
+    if (examMode !== "no_exam") {
+      generateQuestions();
+    }
+  }
 
-    const title = positionName;
+  async function generateQuestions() {
+    setGeneratingQuestions(true);
     const intentDesc = `【项目】${positionName}\n【核心任务】${coreTasks}\n【考核模式】${examMode === "result_delivery" ? "结果交付式" : examMode === "interactive" ? "长效陪跑式" : "无前置考核"}\n【协作模式】${collaborationMode === "offline" ? "深度定制模式" : "平台交付模式"}\n${
       examMode === "result_delivery"
         ? `【交付格式】${deliveryFormats.join("、")}${backgroundText?.trim() ? `\n【背景信息】${backgroundText}` : ""}`
@@ -228,66 +233,19 @@ export default function CorpNewRequirementPage() {
         ? `【业务现状/痛点】${painPoints}\n【业务目标】${coreObjective}\n【考查要点】${keyPoints.join("；")}`
         : ""
     }`;
-
     try {
-      const res = await fetch("/api/requirements", {
+      const res = await fetch("/api/ai/generate-questions", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          title,
-          intent_desc: intentDesc,
-          ai_tags: [examMode === "result_delivery" ? "结果交付" : examMode === "interactive" ? "长效陪跑" : "无前置考核", positionName],
-          business_stage: businessStage,
-          complexity,
-          budget_min: budgetMin ? Number(budgetMin) : null,
-          budget_max: budgetMax ? Number(budgetMax) : null,
-          deadline: deadline || null,
-          question_types: examMode === "result_delivery" ? ["prompt", "solution"] : examMode === "interactive" ? ["interactive"] : ["no_exam"],
-          capability_weights: { execution: 40, strategy: 30, communication: 30 },
-          req_modules: reqModules,
-        }),
-      });
-
-      if (!res.ok) throw new Error("保存失败");
-      const data = await res.json();
-      setRequirementId(data.id);
-      // Clear save loading BEFORE transitioning so Step 3 arrives with a clean state
-      setSavingStep2(false);
-      setStep(3);
-      // Fire independently — skip for no_exam mode (no questions needed)
-      if (examMode !== "no_exam") {
-        generateQuestions(data.id, intentDesc);
-      }
-    } catch {
-      setError("保存失败，请重试");
-      setSavingStep2(false);
-    }
-  }
-
-  async function generateQuestions(reqId: string, intentDescOverride?: string) {
-    setGeneratingQuestions(true);
-    try {
-      const res = await fetch(`/api/requirements/${reqId}/generate-questions`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          intentDesc: intentDescOverride ?? coreTasks,
+          intentDesc,
           title: positionName,
           businessStage,
           complexity,
           questionTypes: examMode === "result_delivery" ? ["prompt", "solution"] : ["interactive"],
           capabilityWeights: { execution: 40, strategy: 30, communication: 30 },
-          // Result delivery mode extra params
-          ...(examMode === "result_delivery" && {
-            backgroundText,
-            deliveryFormats,
-          }),
-          // Interactive mode extra params
-          ...(examMode === "interactive" && {
-            painPoints,
-            coreObjective,
-            keyPoints,
-          }),
+          ...(examMode === "result_delivery" && { backgroundText, deliveryFormats }),
+          ...(examMode === "interactive" && { painPoints, coreObjective, keyPoints }),
         }),
       });
       if (res.ok) {
@@ -302,17 +260,47 @@ export default function CorpNewRequirementPage() {
   }
 
   async function handlePublish() {
-    if (!requirementId) return;
     if (examMode !== "no_exam" && questions.length === 0) return;
     setPublishing(true);
     try {
-      const res = await fetch(`/api/requirements/${requirementId}/publish`, {
+      const intentDesc = `【项目】${positionName}\n【核心任务】${coreTasks}\n【考核模式】${examMode === "result_delivery" ? "结果交付式" : examMode === "interactive" ? "长效陪跑式" : "无前置考核"}\n【协作模式】${collaborationMode === "offline" ? "深度定制模式" : "平台交付模式"}\n${
+        examMode === "result_delivery"
+          ? `【交付格式】${deliveryFormats.join("、")}${backgroundText?.trim() ? `\n【背景信息】${backgroundText}` : ""}`
+          : examMode === "interactive"
+          ? `【业务现状/痛点】${painPoints}\n【业务目标】${coreObjective}\n【考查要点】${keyPoints.join("；")}`
+          : ""
+      }`;
+
+      // 1. Create requirement (will be immediately published, so draft is transient)
+      const createRes = await fetch("/api/requirements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: positionName,
+          intent_desc: intentDesc,
+          ai_tags: [examMode === "result_delivery" ? "结果交付" : examMode === "interactive" ? "长效陪跑" : "无前置考核", positionName],
+          business_stage: businessStage,
+          complexity,
+          budget_min: budgetNegotiable ? null : (budgetMin ? Number(budgetMin) : null),
+          budget_max: budgetNegotiable ? null : (budgetMax ? Number(budgetMax) : null),
+          deadline: deadline || null,
+          question_types: examMode === "result_delivery" ? ["prompt", "solution"] : examMode === "interactive" ? ["interactive"] : ["no_exam"],
+          capability_weights: { execution: 40, strategy: 30, communication: 30 },
+          req_modules: reqModules,
+        }),
+      });
+      if (!createRes.ok) throw new Error("创建失败");
+      const { id } = await createRes.json();
+
+      // 2. Publish (save questions + set active)
+      const publishRes = await fetch(`/api/requirements/${id}/publish`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ questions }),
       });
-      if (!res.ok) throw new Error("发布失败");
-      track("requirement_created", { requirement_id: requirementId, exam_mode: examMode });
+      if (!publishRes.ok) throw new Error("发布失败");
+
+      track("requirement_created", { requirement_id: id, exam_mode: examMode });
       router.push("/corp/requirements");
     } catch {
       setError("发布失败，请重试");
@@ -434,18 +422,18 @@ export default function CorpNewRequirementPage() {
   }
 
   return (
-    <div className="p-8 w-full max-w-7xl mx-auto">
+    <div className="px-4 sm:px-8 py-6 sm:py-8 w-full max-w-7xl mx-auto">
       {/* Header + step indicator */}
       <header className="mb-8">
-        <div className="flex items-start justify-between">
+        <div className="flex flex-wrap gap-3 items-start justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">新建需求</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-800">新建需求</h1>
             <p className="text-slate-400 text-sm mt-1">三步完成智能拟真考核配置</p>
           </div>
           <button
             type="button"
             onClick={openDiagPanel}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition-colors shadow-sm shadow-indigo-200"
+            className="flex items-center gap-2 px-3 sm:px-4 py-2 rounded-xl bg-indigo-600 text-white text-sm font-semibold hover:bg-indigo-700 transition-colors shadow-sm shadow-indigo-200"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -528,27 +516,47 @@ export default function CorpNewRequirementPage() {
       </div>
       <div className="space-y-1.5">
                   <label className="block text-xs font-bold text-slate-500 uppercase ml-1">项目预算 (CNY) <span className="text-red-400">*</span></label>
-                  <div className="flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus-within:border-indigo-400 transition-colors">
-                    <span className="text-slate-400 text-sm">¥</span>
-                    <input
-                      type="number"
-                      min="1"
-                      value={budgetMin}
-                      onChange={(e) => setBudgetMin(e.target.value)}
-                      placeholder="最低"
-                      className="w-full px-2 py-0.5 bg-transparent text-sm outline-none text-center"
-                      required
-                    />
-                    <span className="text-slate-300 mx-1">—</span>
-                    <input
-                      type="number"
-                      min="1"
-                      value={budgetMax}
-                      onChange={(e) => setBudgetMax(e.target.value)}
-                      placeholder="最高"
-                      className="w-full px-2 py-0.5 bg-transparent text-sm outline-none text-center"
-                      required
-                    />
+                  <div className="flex items-center gap-2">
+                    <div className={cn(
+                      "flex-1 flex items-center bg-slate-50 border border-slate-200 rounded-xl px-3 py-2.5 focus-within:border-indigo-400 transition-colors",
+                      budgetNegotiable && "opacity-40 pointer-events-none"
+                    )}>
+                      <span className="text-slate-400 text-sm">¥</span>
+                      <input
+                        type="number"
+                        min="1"
+                        value={budgetMin}
+                        onChange={(e) => setBudgetMin(e.target.value)}
+                        placeholder="最低"
+                        className="w-full px-2 py-0.5 bg-transparent text-sm outline-none text-center"
+                        disabled={budgetNegotiable}
+                      />
+                      <span className="text-slate-300 mx-1">—</span>
+                      <input
+                        type="number"
+                        min="1"
+                        value={budgetMax}
+                        onChange={(e) => setBudgetMax(e.target.value)}
+                        placeholder="最高"
+                        className="w-full px-2 py-0.5 bg-transparent text-sm outline-none text-center"
+                        disabled={budgetNegotiable}
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setBudgetNegotiable(!budgetNegotiable);
+                        if (!budgetNegotiable) { setBudgetMin(""); setBudgetMax(""); }
+                      }}
+                      className={cn(
+                        "px-3 py-2.5 rounded-xl text-xs font-bold border transition-all whitespace-nowrap",
+                        budgetNegotiable
+                          ? "bg-indigo-600 text-white border-indigo-600"
+                          : "bg-white text-slate-500 border-slate-200 hover:border-indigo-300 hover:text-indigo-600"
+                      )}
+                    >
+                      面议
+                    </button>
                   </div>
                 </div>
     </div>
@@ -714,10 +722,12 @@ export default function CorpNewRequirementPage() {
                 <p className="text-[10px] text-slate-400 mb-0.5">核心任务</p>
                 <p className="text-sm text-slate-600 line-clamp-1">{coreTasks}</p>
               </div>
-              {budgetMax && (
+              {(budgetNegotiable || budgetMax) && (
                 <div>
                   <p className="text-[10px] text-slate-400 mb-0.5">预算</p>
-                  <p className="text-sm font-bold text-slate-700">¥{budgetMin}–{budgetMax}</p>
+                  <p className="text-sm font-bold text-slate-700">
+                    {budgetNegotiable ? "面议" : `¥${budgetMin}–${budgetMax}`}
+                  </p>
                 </div>
               )}
             </div>
@@ -900,8 +910,8 @@ export default function CorpNewRequirementPage() {
           {error && <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl">{error}</div>}
 
           <div className="flex gap-4 justify-between">
-            <Button type="button" variant="secondary" onClick={() => { setSavingStep2(false); setAnalyzing(false); setStep(1); }}>← 返回修改</Button>
-            <Button type="submit" loading={savingStep2} size="lg">保存并 AI 生成题目 →</Button>
+            <Button type="button" variant="secondary" onClick={() => { setAnalyzing(false); setStep(1); }}>← 返回修改</Button>
+            <Button type="submit" size="lg">保存并 AI 生成题目 →</Button>
           </div>
         </form>
       )}
@@ -982,7 +992,7 @@ export default function CorpNewRequirementPage() {
               !generatingQuestions && (
                 <div className="text-center py-10 text-slate-400">
                   <p className="mb-4">题目生成失败，请重试</p>
-                  <Button onClick={() => requirementId && generateQuestions(requirementId)}>重新生成</Button>
+                  <Button onClick={() => generateQuestions()}>重新生成</Button>
                 </div>
               )
             )}
@@ -991,11 +1001,7 @@ export default function CorpNewRequirementPage() {
           {error && <div className="bg-red-50 border border-red-200 text-red-600 text-sm px-4 py-3 rounded-xl">{error}</div>}
 
           <div className="flex gap-4 justify-between">
-            <Button
-              variant="secondary"
-              disabled={generatingQuestions}
-              onClick={() => { setPublishing(false); setGeneratingQuestions(false); setStep(2); }}
-            >
+            <Button type="button" variant="secondary" onClick={() => { setPublishing(false); setGeneratingQuestions(false); setStep(2); }}>
               ← 返回配置
             </Button>
             <Button

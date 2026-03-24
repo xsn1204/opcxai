@@ -1,6 +1,7 @@
 import { prisma } from "@/lib/db";
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import { getSession } from "@/lib/auth";
 import { CAPABILITY_MODULES, parseEnterpriseBio, ENTERPRISE_INFRA, ENTERPRISE_BUSINESS_TAGS, ENTERPRISE_SPECIALTIES } from "@/types";
 import { safeJsonParse } from "@/lib/json-utils";
 import { TalentInviteButton } from "@/components/corp/TalentInviteButton";
@@ -25,17 +26,44 @@ export default async function TalentDetailPage({
 }) {
   const { id } = await params;
 
-  const talent = await prisma.talentProfile.findUnique({
-    where: { id },
-    include: {
-      user: { select: { email: true } },
-      portfolio_cases: {
-        orderBy: { created_at: "desc" },
+  const [talent, session] = await Promise.all([
+    prisma.talentProfile.findUnique({
+      where: { id },
+      include: {
+        user: { select: { email: true } },
+        portfolio_cases: {
+          orderBy: { created_at: "desc" },
+        },
       },
-    },
-  });
+    }),
+    getSession(),
+  ]);
 
   if (!talent) notFound();
+
+  // Pre-fetch which requirements this corp has already invited/received submissions from this talent
+  let invitedReqIds: string[] = [];
+  let submittedReqIds: string[] = [];
+  if (session) {
+    const corpProfile = await prisma.corpProfile.findUnique({
+      where: { user_id: session.sub },
+      select: { id: true },
+    });
+    if (corpProfile) {
+      const [invitedCollabs, submissions] = await Promise.all([
+        prisma.collaboration.findMany({
+          where: { corp_id: corpProfile.id, talent_id: id, type: { in: ["assessment", "no_exam_intent"] } },
+          select: { requirement_id: true },
+        }),
+        prisma.submission.findMany({
+          where: { talent_id: id, requirement: { corp_id: corpProfile.id } },
+          select: { requirement_id: true },
+        }),
+      ]);
+      invitedReqIds = invitedCollabs.map((c) => c.requirement_id);
+      submittedReqIds = submissions.map((s) => s.requirement_id);
+    }
+  }
 
   const enterpriseBio = parseEnterpriseBio(talent.bio);
   const isEnterprise = !!enterpriseBio;
@@ -44,7 +72,7 @@ export default async function TalentDetailPage({
   const displayName = isEnterprise ? (enterpriseBio.enterprise_name || talent.username) : talent.username;
 
   return (
-    <div className="p-8 max-w-5xl mx-auto">
+    <div className="px-4 sm:px-8 py-6 sm:py-8 max-w-5xl mx-auto">
       {/* 面包屑 */}
       <div className="flex items-center gap-2 text-xs text-slate-400 mb-6">
         <Link href="/corp/market" className="hover:text-slate-600">OPC市场</Link>
@@ -101,7 +129,7 @@ export default async function TalentDetailPage({
                 </span>
               )}
               <div className="ml-auto">
-                <TalentInviteButton talentId={talent.id} talentName={displayName} isEnterprise={isEnterprise} />
+                <TalentInviteButton talentId={talent.id} talentName={displayName} isEnterprise={isEnterprise} invitedReqIds={invitedReqIds} submittedReqIds={submittedReqIds} />
               </div>
             </div>
 

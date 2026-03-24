@@ -21,6 +21,13 @@ export async function POST(request: Request) {
     });
     if (existing) return NextResponse.json({ alreadyInvited: true, id: existing.id });
 
+    // Block re-invite if talent has already submitted (self-initiated or prior invite)
+    const submission = await prisma.submission.findFirst({
+      where: { talent_id, requirement_id },
+      select: { id: true },
+    });
+    if (submission) return NextResponse.json({ alreadyInvited: true });
+
     // ── Quota gate ──────────────────────────────────────────────────────
     const { quota } = await getCorpQuota(corpProfile.id);
     if (quota <= 0) {

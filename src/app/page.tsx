@@ -1,4 +1,5 @@
 import Link from "next/link";
+import ContactForm from "@/components/ContactForm";
 
 const CAPABILITY_MODULES = [
   { id: "ai_products", label: "AI产品原型与开发", icon: "🔧", desc: "快速搭建 MVP，AI 编程全链路交付" },
@@ -217,7 +218,9 @@ export default function LandingPage() {
         <div className="flex items-center gap-8 text-sm font-medium text-slate-400">
           <a href="#how" className="hover:text-indigo-400 transition-colors">平台介绍</a>
           <a href="#capabilities" className="hover:text-indigo-400 transition-colors">能力图谱</a>
+         
           <Link href="/corp/market" className="hover:text-indigo-400 transition-colors">浏览OPC市场</Link>
+           <a href="#contact" className="hover:text-indigo-400 transition-colors">联系我们</a>
           <Link href="/login" className="text-white hover:text-indigo-400 transition-colors">登录</Link>
         </div>
       </nav>
@@ -471,6 +474,49 @@ export default function LandingPage() {
             </Link>
           </div>
           <p className="mt-5 text-slate-600 text-xs">⏳ 名额有限，先到先得</p>
+        </div>
+      </section>
+
+      {/* ── 联系我们 ── */}
+      <section id="contact" className="border-t border-slate-800">
+        <div className="max-w-7xl mx-auto px-6 py-16">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+            {/* Left: copy */}
+            <div>
+              <p className="text-indigo-400 text-xs uppercase tracking-widest font-semibold mb-3">联系我们</p>
+              <h2 className="text-3xl font-bold text-white mb-4 leading-snug">
+                有想法？<br />
+                <span className="text-indigo-400">和我们聊聊</span>
+              </h2>
+              <p className="text-slate-400 text-sm leading-relaxed mb-8">
+                无论您是寻找 AI 人才的企业、希望获得认证的超级个体，
+                还是对平台感兴趣的合作伙伴，都欢迎留下您的信息，
+                我们将在 1–2 个工作日内与您联系。
+              </p>
+
+              <div className="flex flex-col gap-4">
+                {[
+                  { icon: "📧", label: "联系方式", value: "手机号 · 邮箱" },
+                  { icon: "⏰", label: "响应时间", value: "1–2 个工作日" },
+                           { icon: "🌏", label: "服务范围", value: "企业方 · 超级个体 · OPC社区 · 媒体" },
+                ].map((item) => (
+                  <div key={item.label} className="flex items-center gap-3">
+                    <span className="text-xl w-8 shrink-0">{item.icon}</span>
+                    <div>
+                      <p className="text-slate-500 text-xs">{item.label}</p>
+                      <p className="text-slate-300 text-sm font-medium">{item.value}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Right: form */}
+            <div className="rounded-3xl p-7 border border-slate-700/50"
+              style={{ background: "linear-gradient(145deg, #1e293b, #0f172a)" }}>
+              <ContactForm />
+            </div>
+          </div>
         </div>
       </section>
 

@@ -92,7 +92,7 @@ export default async function SubmissionsPage({
     prisma.collaboration.findMany({
       where: { requirement_id: id, type: "no_exam_intent" },
       include: {
-        talent_profile: { select: { username: true, specialty: true, avg_score: true, collab_count: true } },
+        talent_profile: { select: { id: true, username: true, specialty: true, avg_score: true, collab_count: true } },
       },
       orderBy: { created_at: "desc" },
     }),
@@ -127,6 +127,7 @@ export default async function SubmissionsPage({
     evaluated: { label: "已评分", dot: "bg-indigo-500", text: "text-indigo-600" },
     invited:   { label: "已邀请", dot: "bg-emerald-500", text: "text-emerald-600" },
     rejected:  { label: "已淘汰", dot: "bg-slate-300",  text: "text-slate-400" },
+    dismissed: { label: "已拒绝", dot: "bg-slate-300",  text: "text-slate-400" },
     // collab-level statuses (OPC response)
     collab_accepted:  { label: "已接受", dot: "bg-emerald-500", text: "text-emerald-600" },
     collab_rejected:  { label: "已拒绝", dot: "bg-red-400",     text: "text-red-500" },
@@ -163,7 +164,7 @@ export default async function SubmissionsPage({
       : [];
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div className="px-4 sm:px-8 py-6 sm:py-8 max-w-7xl mx-auto">
       <MarkSubmissionsRead requirementId={id} />
       {/* Breadcrumb */}
       <div className="flex items-center gap-2 text-xs text-slate-400 mb-6">
@@ -473,7 +474,9 @@ export default async function SubmissionsPage({
                 const intentStatusMap: Record<string, { label: string; dot: string; text: string }> = {
                   invited:   { label: "待回应", dot: "bg-amber-400",   text: "text-amber-600" },
                   accepted:  { label: "已接受", dot: "bg-emerald-500", text: "text-emerald-600" },
-                  rejected:  { label: "已拒绝", dot: "bg-slate-300",   text: "text-slate-400" },
+                  rejected:  intent.invitation_message === null
+                    ? { label: "对方已拒绝", dot: "bg-slate-300", text: "text-slate-400" }
+                    : { label: "已拒绝", dot: "bg-slate-300", text: "text-slate-400" },
                   active:    { label: "进行中", dot: "bg-indigo-500",  text: "text-indigo-600" },
                   completed: { label: "已完成", dot: "bg-slate-400",   text: "text-slate-500" },
                 };
@@ -495,7 +498,7 @@ export default async function SubmissionsPage({
                         )}
                       </div>
                       <p className="text-xs text-slate-400 mt-0.5">
-                        {formatRelativeTime(intent.created_at.toISOString())} 发起意向
+                        {formatRelativeTime(intent.created_at.toISOString())} {intent.invitation_message === null ? "企业发起邀请" : "OPC 发起意向"}
                       </p>
                     </div>
 
@@ -514,8 +517,19 @@ export default async function SubmissionsPage({
                     </div>
 
                     <div className="flex gap-2 shrink-0">
-                      {intent.status === "invited" && (
+                      {intent.talent_profile?.id && (
+                        <Link
+                          href={`/corp/talent/${intent.talent_profile.id}`}
+                          className="px-3 py-1.5 text-xs font-bold text-slate-600 bg-slate-100 rounded-lg hover:bg-slate-200 transition-colors"
+                        >
+                          查看主页
+                        </Link>
+                      )}
+                      {intent.status === "invited" && intent.invitation_message !== null && (
                         <NoExamIntentActions collabId={intent.id} />
+                      )}
+                      {intent.status === "invited" && intent.invitation_message === null && (
+                        <span className="text-xs text-slate-400 px-2">等待对方回应</span>
                       )}
                       {(intent.status === "accepted" || intent.status === "active" || intent.status === "completed") && (
                         <Link

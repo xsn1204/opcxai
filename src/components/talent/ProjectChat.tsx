@@ -21,6 +21,7 @@ interface ProjectChatProps {
   corpConfirmed: boolean;
   talentConfirmed: boolean;
   corpStarRating: number | null;
+  hideSidebarOnMobile?: boolean;
 }
 
 // Theme token map — all variant-specific Tailwind classes live here
@@ -101,6 +102,7 @@ export function ProjectChat({
   corpConfirmed: initialCorpConfirmed,
   talentConfirmed: initialTalentConfirmed,
   corpStarRating: initialCorpStarRating,
+  hideSidebarOnMobile = false,
 }: ProjectChatProps) {
   const router = useRouter();
   const t = themes[theme];
@@ -207,7 +209,7 @@ export function ProjectChat({
   return (
     <div className="flex-1 h-full min-h-0 flex overflow-hidden">
       {/* ── Left: Project Info ── */}
-      <div className={cn("w-72 flex-shrink-0 p-5 overflow-y-auto", t.sidebar)}>
+      <div className={cn(hideSidebarOnMobile ? "hidden md:block" : "", "w-72 flex-shrink-0 p-5 overflow-y-auto", t.sidebar)}>
         <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-5">
           项目信息
         </p>
@@ -379,7 +381,7 @@ export function ProjectChat({
       {/* ── Right: Chat ── */}
       <div className="flex-1 flex flex-col min-w-0">
         {/* Chat Header */}
-        <div className={cn("flex-shrink-0 px-6 py-4", t.header)}>
+        <div className={cn("flex-shrink-0 px-3 sm:px-6 py-4", t.header)}>
           <div className="flex items-center gap-3">
             <div
               className={cn(
@@ -401,7 +403,7 @@ export function ProjectChat({
         {/* Messages */}
         <div
           className={cn(
-            "flex-1 overflow-y-auto p-6 space-y-5",
+            "flex-1 overflow-y-auto p-3 sm:p-6 space-y-5",
             t.messagesArea
           )}
         >
@@ -452,7 +454,7 @@ export function ProjectChat({
         </div>
 
         {/* Input */}
-        <div className={cn("flex-shrink-0 px-6 py-4", t.inputArea)}>
+        <div className={cn("flex-shrink-0 px-3 sm:px-6 py-4", t.inputArea)}>
           <form onSubmit={sendMessage} className="flex flex-col gap-2">
             <div className="flex gap-3">
               <input

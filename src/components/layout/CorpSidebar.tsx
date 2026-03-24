@@ -62,7 +62,7 @@ export function CorpSidebar({ companyName }: { companyName?: string }) {
   }
 
   return (
-    <aside className="w-64 bg-white border-r border-slate-200 flex flex-col sticky top-0 h-screen">
+    <aside className="hidden md:flex w-64 bg-white border-r border-slate-200 flex-col sticky top-0 h-screen">
       <div className="p-6">
         <Link href="/corp/market" className="text-2xl font-bold italic text-indigo-600">OPC x AI</Link>
         <p className="text-xs text-slate-400 mt-0.5">企业端</p>

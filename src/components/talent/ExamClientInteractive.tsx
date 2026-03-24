@@ -172,21 +172,20 @@ export function ExamClientInteractive({ requirementId, questions, missionBrief, 
   return (
     <div className="flex flex-col h-full overflow-hidden bg-slate-50">
       {/* Top status bar */}
-      <header className="bg-white border-b border-slate-200 px-6 py-3 flex items-center justify-between flex-shrink-0 shadow-sm">
-        <div className="flex items-center gap-5">
-          <div>
+      <header className="bg-white border-b border-slate-200 px-3 sm:px-6 py-3 flex items-center justify-between flex-shrink-0 shadow-sm">
+        <div className="flex items-center gap-3 sm:gap-5">
+          <div className="hidden sm:block">
             <p className="text-[10px] text-slate-400 uppercase tracking-wider">长效陪跑式考核</p>
-       
           </div>
-          <div className="flex items-center gap-3 pl-5 border-l border-slate-200">
-            <div className="w-32 h-1.5 bg-slate-200 rounded-full overflow-hidden">
+          <div className="flex items-center gap-2 sm:gap-3 sm:pl-5 sm:border-l sm:border-slate-200">
+            <div className="w-20 sm:w-32 h-1.5 bg-slate-200 rounded-full overflow-hidden">
               <div
                 className="h-full bg-violet-500 rounded-full transition-all duration-500"
                 style={{ width: `${progress}%` }}
               />
             </div>
             <span className="text-xs text-slate-500 tabular-nums font-mono">{progress}%</span>
-            <span className="text-xs text-slate-400">{filledCount}/{questions.length} 题</span>
+            <span className="hidden sm:inline text-xs text-slate-400">{filledCount}/{questions.length} 题</span>
           </div>
         </div>
         <div className="flex flex-col items-end gap-1.5">
@@ -214,7 +213,7 @@ export function ExamClientInteractive({ requirementId, questions, missionBrief, 
       {/* Body */}
       <div className="flex-1 flex overflow-hidden">
         {/* Left: Read-only task doc */}
-        <div className="w-80 flex-shrink-0 bg-white border-r border-slate-200 overflow-y-auto">
+        <div className="hidden md:block w-80 flex-shrink-0 bg-white border-r border-slate-200 overflow-y-auto">
           <div className="p-5 space-y-5">
             {positionName && (
               <div>
@@ -233,7 +232,7 @@ export function ExamClientInteractive({ requirementId, questions, missionBrief, 
         </div>
 
         {/* Right: Workspace */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-5">
+        <div className="flex-1 overflow-y-auto p-3 sm:p-6 space-y-5">
           {questions.map((q, i) => (
             <div
               key={q.id}

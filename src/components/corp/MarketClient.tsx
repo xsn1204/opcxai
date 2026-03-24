@@ -35,7 +35,9 @@ interface Props {
   talents: TalentRow[];
   requirements: RequirementRow[];
   moduleLabels: Record<string, ModuleLabel>;
-  invitedPairs: string[]; // "talentId:reqId"
+  invitedPairs: string[];      // corp-initiated: "talentId:reqId"
+  talentIntentPairs: string[]; // talent-initiated: "talentId:reqId"
+  submittedPairs: string[];    // talent already submitted a proposal
 }
 
 interface BioParsed {
@@ -396,6 +398,8 @@ function InviteModal({
   referralBonus,
   referralUrl,
   invitedPairs,
+  talentIntentPairs,
+  submittedPairs,
   onClose,
   onInvited,
   onQuotaChange,
@@ -407,16 +411,12 @@ function InviteModal({
   referralBonus: number;
   referralUrl: string;
   invitedPairs: Set<string>;
+  talentIntentPairs: Set<string>;
+  submittedPairs: Set<string>;
   onClose: () => void;
   onInvited: (talentId: string, reqId: string) => void;
   onQuotaChange: (next: number) => void;
 }) {
-  const statusConfig: Record<string, { label: string; style: string }> = {
-    draft: { label: "草稿", style: "text-slate-400 bg-slate-100" },
-    active: { label: "进行中", style: "text-emerald-600 bg-emerald-50" },
-    closed: { label: "已关闭", style: "text-slate-400 bg-slate-100" },
-    completed: { label: "已完成", style: "text-indigo-600 bg-indigo-50" },
-  };
   const [sending, setSending] = useState<string | null>(null);
   const [sentReqs, setSentReqs] = useState<Set<string>>(new Set());
   const [showShare, setShowShare] = useState(false);
@@ -522,8 +522,10 @@ function InviteModal({
                   </div>
                 ) : (
                   requirements.map((req) => {
-                    const sc = statusConfig[req.status] ?? statusConfig.draft;
-                    const isSent = sentReqs.has(req.id) || invitedPairs.has(`${target.id}:${req.id}`);
+                    const isInvited = sentReqs.has(req.id) || invitedPairs.has(`${target.id}:${req.id}`);
+                    const isTalentIntent = talentIntentPairs.has(`${target.id}:${req.id}`);
+                    const isSubmitted = submittedPairs.has(`${target.id}:${req.id}`);
+                    const isSent = isInvited || isTalentIntent || isSubmitted;
                     const isLoading = sending === req.id;
                     return (
                       <div
@@ -532,9 +534,6 @@ function InviteModal({
                       >
                         <div className="flex items-center gap-2 min-w-0 flex-1 pr-3">
                           <p className="text-sm font-semibold text-slate-700 line-clamp-1">{req.title}</p>
-                          <span className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full ${sc.style}`}>
-                            {sc.label}
-                          </span>
                         </div>
                         <button
                           onClick={() => handleInvite(req.id, req.question_types)}
@@ -544,7 +543,7 @@ function InviteModal({
                             : "shrink-0 text-[11px] font-bold px-3 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors disabled:opacity-50"
                           }
                         >
-                          {isSent ? "✓ 已邀请" : isLoading ? "发送中…" : "邀请"}
+                          {isSubmitted ? "✓ OPC 已提交方案" : isTalentIntent ? "✓ OPC 已发意向" : isInvited ? "✓ 已邀请" : isLoading ? "发送中…" : "邀请"}
                         </button>
                       </div>
                     );
@@ -584,13 +583,14 @@ function InviteModal({
 }
 
 // ─── Main Client Component ────────────────────────────────────────────────────
-export function MarketClient({ talents, requirements, moduleLabels, invitedPairs }: Props) {
+export function MarketClient({ talents, requirements, moduleLabels, invitedPairs, talentIntentPairs, submittedPairs }: Props) {
   const [query, setQuery] = useState("");
   const [typeFilter, setTypeFilter] = useState<"all" | "individual" | "enterprise">("all");
   const [moduleFilters, setModuleFilters] = useState<string[]>([]);
   const [inviteTarget, setInviteTarget] = useState<{ id: string; name: string } | null>(null);
-  // Set of "talentId:reqId" pairs that have been invited
   const [localInvited, setLocalInvited] = useState<Set<string>>(new Set(invitedPairs));
+  const [localTalentIntent] = useState<Set<string>>(new Set(talentIntentPairs));
+  const [localSubmitted] = useState<Set<string>>(new Set(submittedPairs));
   const [quota, setQuota] = useState<number>(3);
   const [monthlyQuota, setMonthlyQuota] = useState<number>(3);
   const [referralBonus, setReferralBonus] = useState<number>(0);
@@ -666,18 +666,18 @@ export function MarketClient({ talents, requirements, moduleLabels, invitedPairs
   ];
 
   return (
-    <div className="p-8 min-h-screen bg-slate-50">
+    <div className="px-4 sm:px-8 py-6 sm:py-8 min-h-screen bg-slate-50">
       {/* Page header */}
-      <header className="mb-8">
-        <div className="flex items-start justify-between">
+      <header className="mb-6 sm:mb-8">
+        <div className="flex flex-wrap gap-3 items-start justify-between">
           <div>
-            <h1 className="text-2xl font-bold text-slate-800">OPC能力市场</h1>
+            <h1 className="text-xl sm:text-2xl font-bold text-slate-800">OPC能力市场</h1>
             <p className="text-slate-400 text-sm mt-1">
               浏览经过拟真考核验证的 AI 超级个体与专业交付机构
             </p>
           </div>
           {/* Quota + share */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2 sm:gap-3">
             <div className={`flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs font-bold border ${
               quota <= 0
                 ? "bg-red-50 text-red-500 border-red-200"
@@ -834,6 +834,8 @@ export function MarketClient({ talents, requirements, moduleLabels, invitedPairs
           referralBonus={referralBonus}
           referralUrl={referralUrl}
           invitedPairs={localInvited}
+          talentIntentPairs={localTalentIntent}
+          submittedPairs={localSubmitted}
           onClose={() => setInviteTarget(null)}
           onInvited={handleInvited}
           onQuotaChange={setQuota}

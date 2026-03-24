@@ -26,9 +26,9 @@ export default async function SubmittedPage({ params }: { params: Promise<{ id: 
   const statusInfo = statusLabels[submission.status] ?? { label: submission.status, color: "text-slate-400" };
 
   return (
-    <div className="min-h-[calc(100vh-65px)] flex flex-col items-center justify-center px-6 py-16">
+    <div className="min-h-[calc(100vh-65px)] flex flex-col items-center justify-center px-4 sm:px-6 py-16">
       <div className="w-24 h-24 rounded-full bg-emerald-500/20 border-2 border-emerald-500 flex items-center justify-center mb-8 text-4xl">✓</div>
-      <h1 className="text-3xl font-bold text-white mb-2">方案已提交！</h1>
+      <h1 className="text-3xl font-bold text-white mb-2">OPC 已发意向！</h1>
       <p className="text-slate-400 text-sm mb-10 text-center max-w-md">你的考核方案已成功提交至企业。AI 将根据配置的权重维度对你的方案进行综合评分。</p>
 
       <div className="bg-slate-800/50 border border-slate-700 rounded-3xl p-8 w-full max-w-md mb-8">
@@ -59,9 +59,9 @@ export default async function SubmittedPage({ params }: { params: Promise<{ id: 
         </ol>
       </div>
 
-      <div className="flex gap-4">
-        <Link href="/talent/challenges" className="px-6 py-3 bg-slate-700 text-slate-200 rounded-xl text-sm font-bold hover:bg-slate-600 transition-colors">继续挑战其他任务</Link>
-        <Link href="/talent/invites" className="px-6 py-3 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-colors">查看我的邀请</Link>
+      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 w-full max-w-md">
+        <Link href="/talent/challenges" className="text-center px-6 py-3 bg-slate-700 text-slate-200 rounded-xl text-sm font-bold hover:bg-slate-600 transition-colors">继续挑战其他任务</Link>
+        <Link href="/talent/invites" className="text-center px-6 py-3 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-colors">查看我的邀请</Link>
       </div>
     </div>
   );

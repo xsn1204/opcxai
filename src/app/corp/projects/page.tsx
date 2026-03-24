@@ -27,7 +27,7 @@ export default async function CorpProjectsPage() {
   });
 
   return (
-    <div className="p-8 w-7xl mx-auto">
+    <div className="px-4 sm:px-8 py-6 sm:py-8 max-w-7xl mx-auto">
       <header className="mb-8 ">
         <h1 className="text-2xl font-bold text-slate-800">项目协作</h1>
         <p className="text-slate-400 text-sm mt-1">正在进行和已完成的协作项目</p>

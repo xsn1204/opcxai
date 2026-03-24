@@ -21,7 +21,7 @@ export default async function CorpRequirementsPage() {
     include: {
       submissions: { select: { status: true, read_by_corp: true } },
       collaborations: {
-        where: { type: "no_exam_intent", status: "invited" },
+        where: { type: "no_exam_intent", status: "invited", invitation_message: { not: null } },
         select: { id: true },
       },
       _count: {
@@ -46,13 +46,13 @@ export default async function CorpRequirementsPage() {
   };
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
-      <header className="flex justify-between items-center mb-8">
+    <div className="px-4 sm:px-8 py-6 sm:py-8 max-w-7xl mx-auto">
+      <header className="flex flex-wrap gap-3 justify-between items-center mb-6 sm:mb-8">
         <div>
-          <h1 className="text-2xl font-bold text-slate-800">需求管理</h1>
+          <h1 className="text-xl sm:text-2xl font-bold text-slate-800">需求管理</h1>
           <p className="text-slate-400 text-sm mt-1">管理你发布的所有考核需求</p>
         </div>
-        <Link href="/corp/new" className="px-6 py-3 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200">
+        <Link href="/corp/new" className="px-4 sm:px-6 py-2.5 sm:py-3 bg-indigo-600 text-white rounded-xl text-sm font-bold hover:bg-indigo-700 transition-colors shadow-lg shadow-indigo-200">
           + 发布新需求
         </Link>
       </header>

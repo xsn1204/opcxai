@@ -23,5 +23,16 @@ export async function POST(_req: Request, { params }: { params: Promise<{ id: st
     data: { status: "dismissed" },
   });
 
+  // Mark the talent's assessment collaboration as rejected so they see "对方已拒绝"
+  await prisma.collaboration.updateMany({
+    where: {
+      talent_id: sub.talent_id,
+      requirement_id: sub.requirement_id,
+      type: "assessment",
+      status: { not: "rejected" },
+    },
+    data: { status: "rejected", is_read: false },
+  });
+
   return NextResponse.json({ success: true });
 }

@@ -87,7 +87,7 @@ export default async function SubmissionReportPage({ params }: { params: Promise
   const collabStatus = sub.collaboration?.status ?? null;
 
   return (
-    <div className="p-8 max-w-7xl mx-auto">
+    <div className="px-4 sm:px-8 py-6 sm:py-8 max-w-7xl mx-auto">
       <div className="flex items-center gap-2 text-xs text-slate-400 mb-6">
         <Link href="/corp/requirements" className="hover:text-slate-600">需求管理</Link>
         <span>›</span>

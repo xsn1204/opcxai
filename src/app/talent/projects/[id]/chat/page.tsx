@@ -35,6 +35,7 @@ export default async function TalentProjectChatPage({ params }: { params: Promis
       corpConfirmed={collab.corp_confirmed_complete}
       talentConfirmed={collab.talent_confirmed_complete}
       corpStarRating={collab.corp_star_rating ?? null}
+      hideSidebarOnMobile
       />
     </div>
   );

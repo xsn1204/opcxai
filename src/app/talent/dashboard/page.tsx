@@ -26,11 +26,11 @@ export default async function TalentDashboard() {
   const toolStack: string[] = JSON.parse(profile?.tool_stack || "[]");
 
   return (
-    <div className="max-w-7xl mx-auto px-8 py-10">
-      {/* Top row: 4 columns with 2:1:1 ratio */}
-      <div className="grid grid-cols-4 gap-5 mb-10 items-stretch">
-        {/* 能力提升推送 banner - spans 2 columns */}
-        <div className="col-span-2 h-64">
+    <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6 sm:py-10">
+      {/* Top row: 4 columns on desktop, 2 on tablet, 1 on mobile */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 mb-8 sm:mb-10 items-stretch">
+        {/* 能力提升推送 banner - spans 2 columns on lg */}
+        <div className="sm:col-span-2 h-64">
           <CourseBanner />
         </div>
 

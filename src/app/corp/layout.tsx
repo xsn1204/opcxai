@@ -1,6 +1,8 @@
 import { getSession } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import { CorpSidebar } from "@/components/layout/CorpSidebar";
+import { CorpTopBar } from "@/components/layout/CorpTopBar";
+import { CorpBottomNav } from "@/components/layout/CorpBottomNav";
 import { prisma } from "@/lib/db";
 
 export default async function CorpLayout({ children }: { children: React.ReactNode }) {
@@ -14,9 +16,11 @@ export default async function CorpLayout({ children }: { children: React.ReactNo
   });
 
   return (
-    <div className="h-screen bg-slate-50 flex">
+    <div className="h-screen bg-slate-50 flex flex-col md:flex-row">
+      <CorpTopBar companyName={profile?.company_name} />
       <CorpSidebar companyName={profile?.company_name} />
-      <main className="flex-1 min-h-0 flex flex-col overflow-y-auto">{children}</main>
+      <main className="flex-1 min-h-0 flex flex-col overflow-y-auto pb-16 md:pb-0">{children}</main>
+      <CorpBottomNav />
     </div>
   );
 }

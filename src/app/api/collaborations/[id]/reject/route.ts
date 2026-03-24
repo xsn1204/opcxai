@@ -7,20 +7,29 @@ export async function POST(
 ) {
   const { id } = await params;
   try {
-    await prisma.collaboration.update({
-      where: { id },
-      data: { status: "rejected", unread_for_corp: true },
-    });
-
-    // Mark the talent's invitation notification as read
+    // Fetch first to determine type — corp rejects no_exam_intent (no self-notification needed),
+    // talent rejects collaboration (corp needs to know via unread_for_corp)
     const collab = await prisma.collaboration.findUnique({
       where: { id },
       include: { talent_profile: { select: { user_id: true } } },
     });
-    if (collab?.talent_profile) {
-      if (collab.type === "no_exam_intent") {
-        // Corp rejected talent's intent — is_read stays false so intentResponses picks it up
-        // Do NOT set unread_for_talent=true; that field is reserved for new chat messages only
+    if (!collab) return NextResponse.json({ error: "Not found" }, { status: 404 });
+
+    const isCorpRejectingIntent = collab.type === "no_exam_intent" && collab.invitation_message !== null;
+    await prisma.collaboration.update({
+      where: { id },
+      data: {
+        status: "rejected",
+        // Corp rejecting talent's confirmed intent → talent needs to see the rejection
+        // Talent rejecting corp's invite (collaboration OR no_exam_intent with null message) → corp needs notification
+        unread_for_corp: !isCorpRejectingIntent,
+        unread_for_talent: isCorpRejectingIntent,
+      },
+    });
+
+    if (collab.talent_profile) {
+      if (collab.type === "no_exam_intent" && collab.invitation_message !== null) {
+        // Corp rejected talent's confirmed intent — talent sees "对方拒绝意向" via is_read staying false
       } else {
         await prisma.notification.updateMany({
           where: {

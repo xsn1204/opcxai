@@ -25,7 +25,7 @@ export default async function TalentChallengesPage() {
   }));
 
   return (
-    <div className="max-w-7xl mx-auto px-8 py-10">
+    <div className="max-w-7xl mx-auto px-4 sm:px-8 py-6 sm:py-10">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white">任务大厅</h1>
         <p className="text-slate-500 text-sm mt-2">

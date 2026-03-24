@@ -35,6 +35,7 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
   let alreadySubmitted = false;
   let alreadyIntented = false;
   let corpInvited = false;
+  let intentTerminated = false; // any side has rejected — no further action possible
   if (session) {
     const talentProfile = await prisma.talentProfile.findUnique({
       where: { user_id: session.sub },
@@ -42,27 +43,42 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
     });
     if (talentProfile) {
       if (isNoExam) {
-        const existingIntent = await prisma.collaboration.findFirst({
+        // Talent has an active confirmed intent (not rejected)
+        const confirmedIntent = await prisma.collaboration.findFirst({
           where: {
             requirement_id: id,
             talent_id: talentProfile.id,
-            invitation_message: "OPC 人才通过无前置考核通道发起合作意向",
-          },
-          select: { id: true },
-        });
-        alreadyIntented = !!existingIntent;
-
-        // Corp-initiated invite (invitation_message is null)
-        const corpInvite = await prisma.collaboration.findFirst({
-          where: {
-            requirement_id: id,
-            talent_id: talentProfile.id,
-            invitation_message: null,
             type: "no_exam_intent",
+            invitation_message: { not: null },
+            status: { not: "rejected" },
           },
           select: { id: true },
         });
-        corpInvited = !!corpInvite;
+        alreadyIntented = !!confirmedIntent;
+
+        if (!alreadyIntented) {
+          // Unconfirmed corp invite (invitation_message null, not rejected)
+          const corpInvite = await prisma.collaboration.findFirst({
+            where: {
+              requirement_id: id,
+              talent_id: talentProfile.id,
+              invitation_message: null,
+              type: "no_exam_intent",
+              status: { not: "rejected" },
+            },
+            select: { id: true },
+          });
+          corpInvited = !!corpInvite;
+
+          if (!corpInvited) {
+            // Any rejected record means this opportunity is closed for both sides
+            const rejected = await prisma.collaboration.findFirst({
+              where: { requirement_id: id, talent_id: talentProfile.id, type: "no_exam_intent", status: "rejected" },
+              select: { id: true },
+            });
+            intentTerminated = !!rejected;
+          }
+        }
       } else {
         const existing = await prisma.submission.findFirst({
           where: { requirement_id: id, talent_id: talentProfile.id },
@@ -74,25 +90,29 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
   }
 
   return (
-    <div className="max-w-5xl mx-auto px-8 py-10">
+    <div className="max-w-5xl mx-auto px-4 sm:px-8 py-6 sm:py-10">
       <div className="flex items-center gap-2 text-xs text-slate-500 mb-6">
         <Link href="/talent/challenges" className="hover:text-slate-300 transition-colors">任务大厅</Link>
         <span>›</span>
         <span className="text-slate-300">{req.title}</span>
       </div>
 
-      <div className="grid grid-cols-3 gap-8">
-        <div className="col-span-2 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 lg:gap-8">
+        <div className="lg:col-span-2 space-y-6">
           <div>
             <h1 className="text-3xl font-bold text-white mb-3">{req.title}</h1>
             <div className="flex items-center gap-3 text-sm text-slate-500">
               <span>发布方：{req.corp_profile?.company_name}</span>
               {req.deadline && <span>截至：{new Date(req.deadline).toLocaleDateString("zh-CN")}</span>}
-              {isNoExam && (
-                <span className="text-[11px] font-bold px-2 py-0.5 rounded-full bg-teal-500/15 text-teal-400 border border-teal-500/20">
-                  无前置考核
-                </span>
-              )}
+              <span className="text-[12px] font-black text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2.5 py-0.5 rounded-full">
+                {req.budget_min && req.budget_max
+                  ? `¥${req.budget_min.toLocaleString()} — ¥${req.budget_max.toLocaleString()}`
+                  : req.budget_min
+                  ? `¥${req.budget_min.toLocaleString()}+`
+                  : req.budget_max
+                  ? `¥${req.budget_max.toLocaleString()} 以内`
+                  : "面议"}
+              </span>
             </div>
           </div>
 
@@ -163,7 +183,7 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
           )}
         </div>
 
-        <div className="space-y-4">
+        <div className="space-y-4 order-first lg:order-last">
           {/* Corp profile card */}
           <div className="bg-slate-800/50 border border-slate-700 rounded-2xl p-5 space-y-3">
             <div className="flex items-center gap-3">
@@ -258,15 +278,14 @@ export default async function ChallengePage({ params }: { params: Promise<{ id: 
             </p>
             {isNoExam ? (
               corpInvited ? (
-                <Link
-                  href="/talent/invites"
-                  className="block w-full py-3 bg-white text-teal-600 rounded-xl font-bold text-sm text-center hover:bg-teal-50 transition-colors"
-                >
-                  📩 企业邀请你合作 → 查看邀请
-                </Link>
+                <IntentButton reqId={req.id} corpInvited />
               ) : alreadyIntented ? (
                 <div className="w-full py-3 bg-white/20 text-white/60 rounded-xl font-bold text-sm text-center cursor-not-allowed">
                   ✓ 已发送合作意向
+                </div>
+              ) : intentTerminated ? (
+                <div className="w-full py-3 bg-white/10 text-white/40 rounded-xl font-bold text-sm text-center cursor-not-allowed">
+                  此合作机会已关闭
                 </div>
               ) : (
                 <IntentButton reqId={req.id} />

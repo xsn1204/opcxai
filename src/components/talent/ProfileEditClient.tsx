@@ -749,7 +749,7 @@ export function ProfileEditClient({ userType, initialData, email }: Props) {
   };
 
   return (
-    <div className="w-2xl mx-auto px-8 py-10">
+    <div className="w-2xl mx-auto px-4 sm:px-8 py-6 sm:py-10">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white">账户设置</h1>
         <p className="text-slate-400 text-sm mt-1">管理信息与能力配置</p>

@@ -13,7 +13,7 @@ export async function GET() {
     });
     if (!corpProfile) return NextResponse.json({ submissions: 0, messages: 0, intents: 0 });
 
-    const [submissions, messages, intents, collabResponses] = await Promise.all([
+    const [submissions, messages, intents, collabResponses, newProjects] = await Promise.all([
       // unread submissions (pending AI scoring or already evaluated, not yet viewed by corp)
       prisma.submission.count({
         where: {
@@ -31,21 +31,22 @@ export async function GET() {
           type: { in: ["collaboration", "no_exam_intent"] },
         },
       }),
-      // pending no-exam intents awaiting corp response
+      // pending no-exam intents awaiting corp response (talent-confirmed only)
       prisma.collaboration.count({
         where: {
           corp_id: corpProfile.id,
           type: "no_exam_intent",
           status: "invited",
+          invitation_message: { not: null },
         },
       }),
-      // OPC accepted/rejected collab invites (unread by corp)
+      // Talent accepted/rejected corp invites (unread by corp)
       prisma.collaboration.count({
         where: {
           corp_id: corpProfile.id,
           unread_for_corp: true,
           status: { in: ["accepted", "rejected"] },
-          type: "collaboration",
+          type: { in: ["collaboration", "no_exam_intent"] },
         },
       }),
       // newly accepted collabs (OPC accepted, corp hasn't visited yet)

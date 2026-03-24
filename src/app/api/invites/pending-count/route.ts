@@ -13,7 +13,7 @@ export async function GET() {
     });
     if (!talentProfile) return NextResponse.json({ count: 0, invites: 0, projects: 0 });
 
-    const [invites, projects, intentResponses] = await Promise.all([
+    const [invites, projects, intentResponses, corpPendingInvites, rejectedIntents, assessmentRejected] = await Promise.all([
       prisma.collaboration.count({
         where: {
           talent_id: talentProfile.id,
@@ -38,9 +38,37 @@ export async function GET() {
           is_read: false,
         },
       }),
+      // Corp-invited no_exam_intent that talent hasn't responded to yet
+      prisma.collaboration.count({
+        where: {
+          talent_id: talentProfile.id,
+          type: "no_exam_intent",
+          status: "invited",
+          invitation_message: null,
+          is_read: false,
+        },
+      }),
+      // Corp-rejected talent's confirmed intent that talent hasn't seen yet
+      prisma.collaboration.count({
+        where: {
+          talent_id: talentProfile.id,
+          type: "no_exam_intent",
+          status: "rejected",
+          unread_for_talent: true,
+        },
+      }),
+      // Corp dismissed talent after assessment — assessment collab set to rejected+unread
+      prisma.collaboration.count({
+        where: {
+          talent_id: talentProfile.id,
+          type: "assessment",
+          status: "rejected",
+          is_read: false,
+        },
+      }),
     ]);
 
-    return NextResponse.json({ count: invites + intentResponses, invites: invites + intentResponses, projects });
+    return NextResponse.json({ count: invites + intentResponses + corpPendingInvites + rejectedIntents + assessmentRejected, invites: invites + intentResponses + corpPendingInvites + rejectedIntents + assessmentRejected, projects });
   } catch {
     return NextResponse.json({ count: 0, invites: 0, projects: 0 });
   }

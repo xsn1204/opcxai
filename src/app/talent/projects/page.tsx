@@ -34,7 +34,7 @@ export default async function TalentProjectsPage() {
   };
 
   return (
-    <div className="w-2xl mx-auto px-8 py-10">
+    <div className="w-2xl mx-auto px-4 sm:px-8 py-6 sm:py-10">
       <div className="mb-8">
         <h1 className="text-3xl font-bold text-white">我的项目</h1>
         <p className="text-slate-500 text-sm mt-2">正在进行和已完成的协作项目</p>

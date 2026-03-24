@@ -9,21 +9,18 @@ interface RequirementRow {
   status: string;
 }
 
-const STATUS_CONFIG: Record<string, { label: string; style: string }> = {
-  draft: { label: "草稿", style: "text-slate-400 bg-slate-100" },
-  active: { label: "进行中", style: "text-emerald-600 bg-emerald-50" },
-  closed: { label: "已关闭", style: "text-slate-400 bg-slate-100" },
-  completed: { label: "已完成", style: "text-indigo-600 bg-indigo-50" },
-};
-
 export function TalentInviteButton({
   talentId,
   talentName,
   isEnterprise,
+  invitedReqIds = [],
+  submittedReqIds = [],
 }: {
   talentId: string;
   talentName: string;
   isEnterprise: boolean;
+  invitedReqIds?: string[];
+  submittedReqIds?: string[];
 }) {
   const [open, setOpen] = useState(false);
   const [requirements, setRequirements] = useState<RequirementRow[]>([]);
@@ -32,7 +29,8 @@ export function TalentInviteButton({
   const [referralBonus, setReferralBonus] = useState(0);
   const [referralUrl, setReferralUrl] = useState("");
   const [sending, setSending] = useState<string | null>(null);
-  const [sentReqs, setSentReqs] = useState<Set<string>>(new Set());
+  const [sentReqs, setSentReqs] = useState<Set<string>>(new Set(invitedReqIds));
+  const submittedSet = new Set(submittedReqIds);
 
   useEffect(() => {
     if (!open) return;
@@ -150,14 +148,14 @@ export function TalentInviteButton({
                     </div>
                   ) : (
                     requirements.map((req) => {
-                      const sc = STATUS_CONFIG[req.status] ?? STATUS_CONFIG.draft;
-                      const isSent = sentReqs.has(req.id);
+                      const isInvited = sentReqs.has(req.id);
+                      const isSubmitted = submittedSet.has(req.id);
+                      const isSent = isInvited || isSubmitted;
                       const isLoading = sending === req.id;
                       return (
                         <div key={req.id} className="flex items-center justify-between p-3 rounded-xl border border-slate-100 hover:border-indigo-100 hover:bg-slate-50/60 transition-all">
                           <div className="flex items-center gap-2 min-w-0 flex-1 pr-3">
                             <p className="text-sm font-semibold text-slate-700 line-clamp-1">{req.title}</p>
-                            <span className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full ${sc.style}`}>{sc.label}</span>
                           </div>
                           <button
                             onClick={() => handleInvite(req.id)}
@@ -167,7 +165,7 @@ export function TalentInviteButton({
                               : "shrink-0 text-[11px] font-bold px-3 py-1.5 rounded-lg bg-indigo-600 text-white hover:bg-indigo-700 transition-colors disabled:opacity-50"
                             }
                           >
-                            {isSent ? "✓ 已邀请" : isLoading ? "发送中…" : "邀请"}
+                            {isSubmitted ? "✓ OPC 已发意向" : isInvited ? "✓ 已邀请" : isLoading ? "发送中…" : "邀请"}
                           </button>
                         </div>
                       );
