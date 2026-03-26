@@ -6,28 +6,8 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
-function BetaNotice({ onDismiss }: { onDismiss: () => void }) {
-  return (
-    <div className="fixed inset-0 z-50 bg-[#0f172a] flex flex-col items-center justify-center px-6 text-center">
-      <div className="text-4xl mb-6">🚧</div>
-      <h1 className="text-2xl font-bold text-white mb-3">内测阶段，暂未开放</h1>
-      <p className="text-slate-400 text-base max-w-sm leading-relaxed mb-8">
-        OPC x AI 目前处于内测阶段，尚未对外开放注册。<br />
-        欢迎关注我们，正式上线后第一时间通知你。
-      </p>
-      <button
-        onClick={onDismiss}
-        className="text-xs text-slate-600 hover:text-slate-400 transition-colors underline underline-offset-2"
-      >
-        我是内测用户，继续登录
-      </button>
-    </div>
-  );
-}
-
 export default function LoginPage() {
   const router = useRouter();
-  const [showBeta, setShowBeta] = useState(true);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -68,7 +48,6 @@ export default function LoginPage() {
 
   return (
     <div className="min-h-screen bg-[#0f172a] flex flex-col items-center justify-center px-4">
-      {showBeta && <BetaNotice onDismiss={() => setShowBeta(false)} />}
       <Link href="/" className="text-2xl font-bold italic tracking-tighter text-white mb-10">
         OPC x AI
       </Link>
