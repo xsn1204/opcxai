@@ -9,7 +9,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "请输入有效的邮箱地址" }, { status: 400 });
     }
 
-    const code = generateVerifyCode(email);
+    const code = await generateVerifyCode(email);
     await sendVerifyEmail(email, code);
 
     return NextResponse.json({ success: true });

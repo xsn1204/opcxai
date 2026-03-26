@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Suspense } from "react"; // 注入 Suspense
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { track } from "@/lib/analytics";
@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Steps } from "@/components/ui/badge";
 import { cn } from "@/lib/utils";
 
+// --- 常量定义移到组件外部 ---
 const BUSINESS_TRACKS = [
   { id: "ai_products", label: "AI产品原型与开发", icon: "🔧" },
   { id: "ai_tools", label: "AI工作流与自动化", icon: "🤖" },
@@ -27,7 +28,8 @@ const COMPANY_SIZES = [
   { id: "enterprise", label: "大型企业",   desc: "1000人以上，集团或上市公司" },
 ];
 
-export default function RegisterCorpPage() {
+// --- 实际业务组件 ---
+function RegisterCorpContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const [step, setStep] = useState(1);
@@ -41,7 +43,6 @@ export default function RegisterCorpPage() {
   const [companySize, setCompanySize] = useState("startup");
   const [selectedTracks, setSelectedTracks] = useState<string[]>([]);
 
-  // Email verification state
   const [verifyCode, setVerifyCode] = useState("");
   const [emailVerified, setEmailVerified] = useState(false);
   const [sendingCode, setSendingCode] = useState(false);
@@ -49,20 +50,19 @@ export default function RegisterCorpPage() {
   const [countdown, setCountdown] = useState(0);
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  // Read referral code from URL on mount
   const [referralCode, setReferralCode] = useState("");
+
   useEffect(() => {
     const ref = searchParams.get("ref");
     if (ref) setReferralCode(ref);
   }, [searchParams]);
 
-  // Countdown timer
   useEffect(() => {
     if (countdown > 0) {
       countdownRef.current = setInterval(() => {
         setCountdown((c) => {
           if (c <= 1) {
-            clearInterval(countdownRef.current!);
+            if (countdownRef.current) clearInterval(countdownRef.current);
             return 0;
           }
           return c - 1;
@@ -72,7 +72,6 @@ export default function RegisterCorpPage() {
     return () => { if (countdownRef.current) clearInterval(countdownRef.current); };
   }, [countdown]);
 
-  // Reset verification if email changes
   useEffect(() => {
     setEmailVerified(false);
     setCodeSent(false);
@@ -181,7 +180,6 @@ export default function RegisterCorpPage() {
           <Steps current={step} total={2} labels={["企业信息", "业务需求"]} />
         </div>
 
-        {/* ④ 首批权益 Banner */}
         <div className="mb-5 relative px-5 py-4 bg-indigo-50 border border-indigo-200 rounded-2xl">
           <span className="absolute top-3 right-3 text-[9px] font-bold text-amber-600 bg-amber-50 border border-amber-200 px-2 py-0.5 rounded-full">✦ 限时</span>
           <p className="text-sm font-bold text-indigo-700 mb-2">🚀 首批企业专属权益</p>
@@ -212,7 +210,6 @@ export default function RegisterCorpPage() {
               <form onSubmit={handleStep1} className="space-y-5">
                 <Input label="企业名称" type="text" value={companyName} onChange={(e) => setCompanyName(e.target.value)} placeholder="你的企业或品牌名称" required />
 
-                {/* Company size */}
                 <div className="space-y-2">
                   <label className="block text-sm font-medium text-slate-700">企业规模</label>
                   <div className="grid grid-cols-2 gap-2">
@@ -239,7 +236,6 @@ export default function RegisterCorpPage() {
 
                 <Input label="联系人姓名" type="text" value={contactName} onChange={(e) => setContactName(e.target.value)} placeholder="HR 或负责人姓名" required />
 
-                {/* Email + send code */}
                 <div className="space-y-1.5">
                   <label className="block text-sm font-medium text-slate-700">
                     企业邮箱 <span className="text-red-500">*</span>
@@ -272,7 +268,6 @@ export default function RegisterCorpPage() {
                   </div>
                 </div>
 
-                {/* Verification code input */}
                 {codeSent && !emailVerified && (
                   <div className="space-y-1.5">
                     <label className="block text-sm font-medium text-slate-700">验证码</label>
@@ -294,7 +289,6 @@ export default function RegisterCorpPage() {
                         {sendingCode ? "验证中..." : "验证"}
                       </button>
                     </div>
-                    <p className="text-xs text-slate-400">验证码已发送至 {email}，5 分钟内有效</p>
                   </div>
                 )}
 
@@ -323,7 +317,6 @@ export default function RegisterCorpPage() {
                   <Button type="button" variant="secondary" onClick={() => setStep(1)} className="flex-1 py-4">返回修改</Button>
                   <Button type="submit" loading={loading} className="flex-1 py-4">完成入驻</Button>
                 </div>
-                <p className="text-center text-xs text-slate-400">即刻建联 OPC·开启未来协作方式</p>
               </form>
             </>
           )}
@@ -334,5 +327,14 @@ export default function RegisterCorpPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// --- 最终导出的页面入口 ---
+export default function RegisterCorpPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">正在加载注册页面...</div>}>
+      <RegisterCorpContent />
+    </Suspense>
   );
 }

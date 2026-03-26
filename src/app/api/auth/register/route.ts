@@ -32,7 +32,7 @@ export async function POST(request: Request) {
     }
 
     // ── Email verification check ──────────────────────────────────────────────
-    if (!isEmailVerified(email)) {
+    if (!(await isEmailVerified(email))) {
       return NextResponse.json({ error: "邮箱未验证，请先完成邮箱验证码校验" }, { status: 400 });
     }
 
@@ -115,7 +115,7 @@ export async function POST(request: Request) {
     }
 
     const token = await signToken({ sub: user.id, role: user.role as "talent" | "corp" });
-    consumeEmailVerified(email);
+    await consumeEmailVerified(email);
     const response = NextResponse.json({ role: user.role }, { status: 201 });
     response.cookies.set(COOKIE_NAME, token, {
       httpOnly: true,

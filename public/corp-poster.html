@@ -1,0 +1,1031 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>OPC x AI — 企业入驻海报</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+<style>
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+:root {
+  --bg:        #0a0f1e;
+  --surface:   #111827;
+  --indigo:    #6366f1;
+  --indigo-l:  #818cf8;
+  --violet:    #8b5cf6;
+  --amber:     #f59e0b;
+  --amber-l:   #fbbf24;
+  --slate-3:   #cbd5e1;
+  --slate-4:   #94a3b8;
+  --slate-5:   #64748b;
+  --slate-6:   #475569;
+  --slate-7:   #334155;
+  --slate-8:   #1e293b;
+  --white:     #ffffff;
+  --poster-w:  780px;
+}
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', -apple-system, 'PingFang SC', 'Helvetica Neue', sans-serif;
+  background: #060b16;
+  -webkit-font-smoothing: antialiased;
+  display: flex;
+  justify-content: center;
+  padding: 40px 20px 80px;
+  min-height: 100vh;
+}
+
+/* ── POSTER SHELL ── */
+.poster {
+  width: var(--poster-w);
+  max-width: 100%;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  overflow: hidden;
+  border-radius: 28px;
+  border: 1px solid rgba(99,102,241,0.25);
+  box-shadow:
+    0 0 0 1px rgba(99,102,241,0.08),
+    0 40px 120px rgba(0,0,0,0.7),
+    0 0 80px rgba(99,102,241,0.08);
+  background: var(--bg);
+
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* 显式声明从起点开始 */
+  gap: 0;
+  align-items: stretch;        /* 确保子元素（top-bar）在交叉轴上强制拉伸到底 */
+
+}
+
+/* ── AMBIENT GLOW ── */
+.glow-orb {
+  position: absolute;
+  border-radius: 50%;
+  pointer-events: none;
+  filter: blur(80px);
+  z-index: 0;
+}
+.glow-1 {
+  width: 500px; height: 500px;
+  top: -120px; left: -100px;
+  background: radial-gradient(circle, rgba(99,102,241,0.18) 0%, transparent 70%);
+}
+.glow-2 {
+  width: 400px; height: 400px;
+  top: 200px; right: -80px;
+  background: radial-gradient(circle, rgba(139,92,246,0.12) 0%, transparent 70%);
+}
+.glow-3 {
+  width: 300px; height: 300px;
+  bottom: 100px; left: 50px;
+  background: radial-gradient(circle, rgba(245,158,11,0.06) 0%, transparent 70%);
+}
+
+/* ── NOISE TEXTURE ── */
+.poster::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.025;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 1;
+}
+
+.poster > * { position: relative; z-index: 2; }
+
+/* ── TOP BAR ── */
+.top-bar {
+  background: linear-gradient(90deg, #4f46e5 0%, #7c3aed 50%, #6366f1 100%);
+  padding: 11px 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  
+  /* --- 新增修正代码 --- */
+  width: 100%;             /* 确保横向完全撑开 */
+  margin-top: -1px;        /* 关键：向上偏移 1px 覆盖掉圆角边缘产生的缝隙 */
+  position: relative;      /* 确保它在最上层 */
+  z-index: 3;              /* 稍微高于其他内容，压住边缘 */
+}
+.top-bar-dot {
+  width: 6px; height: 6px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.6);
+  animation: pulse 2s infinite;
+}
+@keyframes pulse {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50%       { opacity: 1;   transform: scale(1.3); }
+}
+.top-bar-text {
+  color: white;
+  font-size: 12.5px;
+  font-weight: 600;
+  letter-spacing: 0.3px;
+}
+.top-bar-badge {
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.3);
+  color: white;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 10px;
+  border-radius: 20px;
+}
+
+/* ── HERO ── */
+.hero {
+  padding: 52px 52px 44px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: 0;
+}
+
+.logo-row {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 28px;
+}
+.logo-opc {
+  font-size: 22px;
+  font-weight: 900;
+  color: white;
+  letter-spacing: -1px;
+  font-style: italic;
+}
+.logo-x-ai {
+  font-size: 22px;
+  font-weight: 900;
+  color: var(--indigo-l);
+  letter-spacing: -0.5px;
+  font-style: italic;
+  margin-left: 5px;
+}
+
+.hero-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  background: rgba(99,102,241,0.12);
+  border: 1px solid rgba(99,102,241,0.3);
+  border-radius: 100px;
+  padding: 5px 14px 5px 10px;
+  margin-bottom: 22px;
+}
+.hero-pill-dot {
+  width: 7px; height: 7px;
+  border-radius: 50%;
+  background: var(--indigo-l);
+  animation: pulse 2s infinite;
+}
+.hero-pill-text {
+  font-size: 11.5px;
+  font-weight: 600;
+  color: var(--indigo-l);
+  letter-spacing: 0.3px;
+}
+
+.hero-title {
+  font-size: 46px;
+  font-weight: 900;
+  line-height: 1.1;
+  letter-spacing: -1.5px;
+  color: white;
+  margin-bottom: 10px;
+}
+.hero-title-accent {
+  background: linear-gradient(135deg, var(--indigo-l) 0%, var(--violet) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-sub {
+  font-size: 15px;
+  color: var(--slate-4);
+  line-height: 1.75;
+  max-width: 480px;
+  margin-bottom: 32px;
+}
+
+/* ── STATS ROW ── */
+.stats-row {
+  display: flex;
+  gap: 0;
+  border: 1px solid rgba(99,102,241,0.2);
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(15,23,42,0.6);
+  backdrop-filter: blur(12px);
+  width: 100%;
+}
+.stat-item {
+  flex: 1;
+  padding: 18px 10px;
+  text-align: center;
+  border-right: 1px solid rgba(99,102,241,0.12);
+}
+.stat-item:last-child { border-right: none; }
+.stat-num {
+  font-size: 24px;
+  font-weight: 900;
+  color: white;
+  letter-spacing: -1px;
+  line-height: 1;
+  margin-bottom: 5px;
+}
+.stat-num.amber { color: var(--amber); }
+.stat-num.indigo { color: var(--indigo-l); }
+.stat-label {
+  font-size: 10.5px;
+  color: var(--slate-5);
+  letter-spacing: 0.2px;
+  line-height: 1.4;
+}
+
+/* ── DIVIDER ── */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(99,102,241,0.2), transparent);
+  margin: 0 28px;
+}
+
+/* ── SECTION ── */
+.section {
+  padding: 36px 52px;
+}
+.section-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--slate-5);
+  margin-bottom: 10px;
+}
+.section-title {
+  font-size: 22px;
+  font-weight: 800;
+  color: white;
+  letter-spacing: -0.5px;
+  margin-bottom: 6px;
+}
+.section-desc {
+  font-size: 13px;
+  color: var(--slate-4);
+  line-height: 1.65;
+  margin-bottom: 24px;
+}
+
+/* ── COMPARE TABLE ── */
+.compare-wrap {
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid rgba(99,102,241,0.15);
+}
+.compare-header {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  background: rgba(30,41,59,0.6);
+}
+.compare-header-cell {
+  padding: 14px 18px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  border-right: 1px solid rgba(99,102,241,0.1);
+}
+.compare-header-cell:last-child { border-right: none; }
+.compare-header-cell.label-col { color: var(--slate-5); }
+.compare-header-cell.bad-col   { color: var(--slate-6); }
+.compare-header-cell.good-col  { color: var(--indigo-l); }
+
+.compare-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  border-top: 1px solid rgba(99,102,241,0.07);
+  transition: background 0.15s;
+}
+.compare-row:hover { background: rgba(99,102,241,0.04); }
+.compare-cell {
+  padding: 13px 18px;
+  font-size: 13px;
+  border-right: 1px solid rgba(99,102,241,0.07);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.compare-cell:last-child { border-right: none; }
+.compare-cell.label-col {
+  color: var(--slate-4);
+  font-weight: 600;
+  font-size: 12px;
+}
+.compare-cell.bad-col {
+  color: var(--slate-6);
+  text-decoration: line-through;
+  text-decoration-color: rgba(100,116,139,0.5);
+  font-size: 12.5px;
+}
+.compare-cell.good-col {
+  color: white;
+  font-weight: 600;
+  font-size: 12.5px;
+}
+.check-icon {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: rgba(99,102,241,0.2);
+  border: 1px solid rgba(99,102,241,0.4);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 10px;
+  color: var(--indigo-l);
+}
+.x-icon {
+  width: 18px; height: 18px;
+  border-radius: 50%;
+  background: rgba(100,116,139,0.1);
+  border: 1px solid rgba(100,116,139,0.2);
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0;
+  font-size: 10px;
+  color: var(--slate-6);
+}
+
+/* ── FLOW STEPS ── */
+.flow-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  position: relative;
+}
+.flow-steps::before {
+  content: '';
+  position: absolute;
+  left: 19px; top: 24px; bottom: 24px;
+  width: 2px;
+  background: linear-gradient(180deg, rgba(99,102,241,0.5) 0%, rgba(99,102,241,0.1) 100%);
+}
+.flow-step {
+  display: flex;
+  gap: 18px;
+  align-items: flex-start;
+  padding: 12px 0;
+}
+.step-num {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, rgba(99,102,241,0.3), rgba(139,92,246,0.2));
+  border: 1.5px solid rgba(99,102,241,0.4);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px;
+  font-weight: 800;
+  color: var(--indigo-l);
+  flex-shrink: 0;
+  position: relative;
+  z-index: 1;
+}
+.step-content { flex: 1; padding-top: 8px; }
+.step-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: white;
+  margin-bottom: 4px;
+}
+.step-desc {
+  font-size: 12.5px;
+  color: var(--slate-4);
+  line-height: 1.6;
+}
+
+/* ── CAPABILITIES GRID ── */
+.cap-grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+}
+.cap-card {
+  background: rgba(30,41,59,0.5);
+  border: 1px solid rgba(99,102,241,0.12);
+  border-radius: 14px;
+  padding: 16px 14px;
+  transition: border-color 0.2s, background 0.2s, transform 0.2s;
+  cursor: default;
+}
+.cap-card:hover {
+  border-color: rgba(99,102,241,0.35);
+  background: rgba(30,41,59,0.8);
+  transform: translateY(-2px);
+}
+.cap-icon { font-size: 22px; margin-bottom: 8px; display: block; }
+.cap-name {
+  font-size: 12px;
+  font-weight: 700;
+  color: white;
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+.cap-desc {
+  font-size: 10.5px;
+  color: var(--slate-5);
+  line-height: 1.5;
+}
+
+/* ── OPC CERT CARD ── */
+.cert-showcase {
+  display: flex;
+  gap: 16px;
+  align-items: stretch;
+}
+.cert-card {
+  flex: 1;
+  border-radius: 20px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.cert-card.purple {
+  background: linear-gradient(160deg, #0f0720 0%, #1a0a3d 40%, #2d1060 75%, #4c1d95 100%);
+  border: 1px solid rgba(139,92,246,0.35);
+}
+.cert-card.amber {
+  background: linear-gradient(160deg, #1c1208 0%, #2d1a04 40%, #3d2408 75%, #78350f 100%);
+  border: 1px solid rgba(245,158,11,0.3);
+}
+
+.cert-header {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  margin-bottom: 2px;
+}
+.cert-logo { font-size: 12px; font-weight: 900; color: white; font-style: italic; }
+.cert-logo-accent-v { color: #a78bfa; font-weight: 900; font-style: italic; }
+.cert-logo-accent-a { color: #fbbf24; font-weight: 900; font-style: italic; }
+.cert-type-badge {
+  margin-left: 8px;
+  font-size: 9px;
+  font-weight: 600;
+  padding: 2px 7px;
+  border-radius: 20px;
+  border: 1px solid;
+}
+.cert-type-badge.v { color: #c4b5fd; border-color: rgba(139,92,246,0.4); background: rgba(139,92,246,0.1); }
+.cert-type-badge.a { color: #fcd34d; border-color: rgba(245,158,11,0.4); background: rgba(245,158,11,0.1); }
+
+.cert-identity {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.cert-avatar {
+  width: 38px; height: 38px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 16px;
+  font-weight: 900;
+  color: white;
+  flex-shrink: 0;
+}
+.cert-avatar.purple { background: linear-gradient(135deg, #6366f1, #8b5cf6); }
+.cert-avatar.amber  { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.cert-name { font-size: 13px; font-weight: 700; color: white; }
+.cert-specialty { font-size: 10px; margin-top: 1px; }
+.cert-specialty.v { color: rgba(196,181,253,0.8); }
+.cert-specialty.a { color: rgba(252,211,77,0.8); }
+
+.cert-bio {
+  font-size: 10px;
+  line-height: 1.6;
+  border-left: 2px solid;
+  padding-left: 9px;
+}
+.cert-bio.v { color: rgba(196,181,253,0.6); border-color: rgba(139,92,246,0.3); }
+.cert-bio.a { color: rgba(252,211,77,0.6); border-color: rgba(245,158,11,0.3); }
+
+.cert-scores {
+  display: flex;
+  gap: 8px;
+}
+.cert-score-box {
+  flex: 1;
+  border-radius: 10px;
+  padding: 8px 6px;
+  text-align: center;
+  background: rgba(255,255,255,0.04);
+}
+.cert-score-box.v { border: 1px solid rgba(139,92,246,0.15); }
+.cert-score-box.a { border: 1px solid rgba(245,158,11,0.15); }
+.cert-score-num { font-size: 18px; font-weight: 800; color: var(--amber); line-height: 1; }
+.cert-score-num.v2 { color: #a78bfa; }
+.cert-score-label { font-size: 9px; margin-top: 3px; }
+.cert-score-label.v { color: rgba(196,181,253,0.5); }
+.cert-score-label.a { color: rgba(252,211,77,0.5); }
+.cert-stars { font-size: 9px; color: rgba(245,158,11,0.5); letter-spacing: 1px; margin-top: 2px; }
+
+.cert-tags-label { font-size: 8.5px; letter-spacing: 1.5px; text-transform: uppercase; font-weight: 600; margin-bottom: 5px; }
+.cert-tags-label.v { color: rgba(167,139,250,0.4); }
+.cert-tags-label.a { color: rgba(251,191,36,0.4); }
+.cert-tags { display: flex; flex-wrap: wrap; gap: 4px; }
+.cert-tag {
+  font-size: 9px;
+  padding: 2px 7px;
+  border-radius: 20px;
+  font-weight: 500;
+}
+.cert-tag.v { color: #c4b5fd; border: 1px solid rgba(139,92,246,0.2); background: rgba(139,92,246,0.08); }
+.cert-tag.a { color: #fcd34d; border: 1px solid rgba(245,158,11,0.2); background: rgba(245,158,11,0.08); }
+
+.cert-footer {
+  margin-top: auto;
+  border-radius: 10px;
+  padding: 8px 10px;
+  background: rgba(255,255,255,0.04);
+}
+.cert-footer.v { border: 1px solid rgba(139,92,246,0.12); }
+.cert-footer.a { border: 1px solid rgba(245,158,11,0.12); }
+.cert-footer-label { font-size: 8.5px; color: #64748b; margin-bottom: 5px; }
+.cert-footer-tools { display: flex; flex-wrap: wrap; gap: 3px; }
+.cert-footer-tool {
+  font-size: 9px;
+  padding: 1.5px 6px;
+  border-radius: 5px;
+  color: #94a3b8;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(100,116,139,0.3);
+}
+
+/* ── GUARANTEE STRIP ── */
+.guarantee-strip {
+  padding: 28px 52px;
+  display: flex;
+  gap: 16px;
+}
+.guarantee-item {
+  flex: 1;
+  background: rgba(99,102,241,0.06);
+  border: 1px solid rgba(99,102,241,0.14);
+  border-radius: 16px;
+  padding: 18px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  transition: border-color 0.2s;
+}
+.guarantee-item:hover { border-color: rgba(99,102,241,0.3); }
+.guarantee-icon { font-size: 22px; }
+.guarantee-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: white;
+}
+.guarantee-desc {
+  font-size: 11.5px;
+  color: var(--slate-4);
+  line-height: 1.55;
+}
+
+/* ── TESTIMONIALS ── */
+.testimonials {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.testimonial {
+  background: rgba(30,41,59,0.4);
+  border: 1px solid rgba(99,102,241,0.1);
+  border-radius: 16px;
+  padding: 16px 20px;
+  display: flex;
+  gap: 14px;
+  align-items: flex-start;
+}
+.testimonial-avatar {
+  width: 36px; height: 36px;
+  border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 15px;
+  font-weight: 800;
+  color: white;
+  flex-shrink: 0;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+}
+.testimonial-content { flex: 1; }
+.testimonial-quote {
+  font-size: 12.5px;
+  color: var(--slate-3);
+  line-height: 1.65;
+  font-style: italic;
+  margin-bottom: 8px;
+}
+.testimonial-quote::before { content: '"'; color: var(--indigo-l); font-size: 16px; font-style: normal; }
+.testimonial-quote::after  { content: '"'; color: var(--indigo-l); font-size: 16px; font-style: normal; }
+.testimonial-meta { display: flex; align-items: center; gap: 8px; }
+.testimonial-name { font-size: 11px; font-weight: 700; color: white; }
+.testimonial-role { font-size: 10.5px; color: var(--slate-5); }
+.testimonial-stars { font-size: 10px; color: var(--amber); letter-spacing: 1px; margin-left: auto; }
+
+/* ── CTA BLOCK ── */
+.cta-block {
+  padding: 48px 52px 52px;
+  text-align: center;
+  background: linear-gradient(180deg, transparent, rgba(99,102,241,0.05) 50%, transparent);
+  position: relative;
+}
+.cta-block::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 52px; right: 52px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(99,102,241,0.3), transparent);
+}
+.cta-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--indigo-l);
+  margin-bottom: 14px;
+}
+.cta-title {
+  font-size: 34px;
+  font-weight: 900;
+  line-height: 1.15;
+  letter-spacing: -1px;
+  color: white;
+  margin-bottom: 12px;
+}
+.cta-title span {
+  background: linear-gradient(135deg, var(--indigo-l), var(--violet));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.cta-sub {
+  font-size: 14px;
+  color: var(--slate-4);
+  margin-bottom: 32px;
+  line-height: 1.7;
+}
+.cta-buttons {
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  margin-bottom: 20px;
+}
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: white;
+  color: #0f172a;
+  font-size: 14px;
+  font-weight: 800;
+  padding: 14px 28px;
+  border-radius: 14px;
+  border: none;
+  cursor: pointer;
+  letter-spacing: -0.2px;
+  box-shadow: 0 4px 20px rgba(255,255,255,0.1);
+  transition: transform 0.15s, box-shadow 0.15s;
+  text-decoration: none;
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(255,255,255,0.15);
+}
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(99,102,241,0.15);
+  color: var(--indigo-l);
+  font-size: 14px;
+  font-weight: 700;
+  padding: 14px 28px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(99,102,241,0.35);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, transform 0.15s;
+  text-decoration: none;
+}
+.btn-secondary:hover {
+  background: rgba(99,102,241,0.25);
+  border-color: rgba(99,102,241,0.6);
+  transform: translateY(-2px);
+}
+.cta-url {
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--slate-5);
+  letter-spacing: 0.5px;
+}
+.cta-url span { color: var(--indigo-l); }
+.cta-fine {
+  font-size: 11px;
+  color: var(--slate-6);
+  margin-top: 8px;
+}
+
+/* ── FOOTER ── */
+.poster-footer {
+  background: rgba(10,15,30,0.8);
+  border-top: 1px solid rgba(99,102,241,0.1);
+  padding: 18px 52px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.footer-logo {
+  font-size: 14px;
+  font-weight: 900;
+  color: var(--slate-4);
+  font-style: italic;
+}
+.footer-logo span { color: var(--indigo-l); }
+.footer-copy { font-size: 11px; color: var(--slate-6); }
+
+/* ── PRINT/SHARE HINT ── */
+.hint {
+  margin-top: 24px;
+  text-align: center;
+  font-size: 12px;
+  color: #334155;
+}
+/* 二维码容器 */
+.qr-container {
+  margin: 32px auto 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.qr-code {
+  width: 120px;
+  height: 120px;
+  padding: 8px;
+  background: #ffffff; /* 纯白背景确保扫码率 */
+  border-radius: 16px; /* 苹果式大圆角 */
+  box-shadow: 0 8px 30px rgba(0,0,0,0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+.qr-code img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.qr-hint {
+  font-size: 12px;
+  color: var(--slate-5);
+  font-weight: 500;
+  letter-spacing: 1px;
+}
+</style>
+</head>
+<body>
+
+<div class="poster">
+  <!-- ambient glows: wrapped in absolute container so .poster > * doesn't make them position:relative -->
+  <div style="position:absolute;inset:0;pointer-events:none;z-index:0;overflow:hidden;">
+    <div class="glow-orb glow-1"></div>
+    <div class="glow-orb glow-2"></div>
+    <div class="glow-orb glow-3"></div>
+  </div>
+
+  <!-- TOP BAR -->
+  <div class="top-bar">
+    <div class="top-bar-dot"></div>
+    <span class="top-bar-text">首批企业入驻 · 限时免费开放</span>
+    <span class="top-bar-badge">名额有限，先到先得</span>
+  </div>
+
+  <!-- HERO -->
+  <div class="hero">
+    <div class="logo-row">
+      <span class="logo-opc">OPC</span>
+      <span class="logo-x-ai">x AI</span>
+    </div>
+
+    <div class="hero-pill">
+      <div class="hero-pill-dot"></div>
+      <span class="hero-pill-text">首个 AI 实战胜任力认证与匹配平台</span>
+    </div>
+
+    <h1 class="hero-title">
+      找 AI 人才，<br>
+      <span class="hero-title-accent">不用再碰运气</span>
+    </h1>
+
+    <p class="hero-sub">
+     
+      经平台认证的 AI 超级个体，每一位都经过真实场景考核
+    </p>
+
+    <div class="stats-row">
+      <div class="stat-item">
+        <div class="stat-num amber">3天</div>
+        <div class="stat-label">企业完成<br>首次匹配</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num indigo">8大</div>
+        <div class="stat-label">AI 能力<br>评估维度</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num">AI全程</div>
+        <div class="stat-label">出题 · 评分<br>报告生成</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num amber">0元</div>
+        <div class="stat-label">首批企业<br>免费入驻</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+
+
+
+  <!-- HOW IT WORKS -->
+  <div class="section">
+    <div class="section-label">企业端操作流程</div>
+    <div class="section-title">3 步，锁定经认证的 AI 超级个体</div>
+    <div class="section-desc">无需 HR 介入，无需设计题库，AI 全程处理筛选流程。</div>
+
+    <div class="flow-steps">
+      <div class="flow-step">
+        <div class="step-num">01</div>
+        <div class="step-content">
+          <div class="step-title">描述你的业务目标与需求</div>
+          <div class="step-desc">填写业务方向、预期目标、时间线和预算区间，AI 理解真实意图，自动配置能力权重维度。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">02</div>
+        <div class="step-content">
+          <div class="step-title">AI 自动出题，OPC 完成实战考核</div>
+          <div class="step-desc">平台按你的业务场景生成考核题目，OPC 在真实约束下作答，系统记录完整操作轨迹并评分。</div>
+        </div>
+      </div>
+      <div class="flow-step">
+        <div class="step-num">03</div>
+        <div class="step-content">
+          <div class="step-title">查看评分报告，一键发起合作邀请</div>
+          <div class="step-desc">浏览 OPC 的胜任力报告与认证卡片，按评分排序，一键锁定合适人选，直接开启协作。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- CAPABILITIES -->
+  <div class="section">
+    <div class="section-label">覆盖场景</div>
+    <div class="section-title">八大 AI 协作方向，全面覆盖企业需求</div>
+    <div class="section-desc">从 AI 产品开发到出海品牌，平台精准匹配每个业务场景所需的 AI 能力。</div>
+
+    <div class="cap-grid">
+      <div class="cap-card">
+        <span class="cap-icon">🔧</span>
+        <div class="cap-name">AI 产品原型与开发</div>
+        <div class="cap-desc">快速搭建 MVP，AI 编程全链路交付</div>
+      </div>
+      <div class="cap-card">
+        <span class="cap-icon">🤖</span>
+        <div class="cap-name">AI 工作流与自动化</div>
+        <div class="cap-desc">n8n / Dify / Coze 企业级自动化</div>
+      </div>
+      <div class="cap-card">
+        <span class="cap-icon">📝</span>
+        <div class="cap-name">AIGC 全媒介创作</div>
+        <div class="cap-desc">图文视频一站式 AI 内容生产</div>
+      </div>
+      <div class="cap-card">
+        <span class="cap-icon">🎬</span>
+        <div class="cap-name">短视频与数字人</div>
+        <div class="cap-desc">AI 数字人、矩阵账号批量运营</div>
+      </div>
+      <div class="cap-card">
+        <span class="cap-icon">🌍</span>
+        <div class="cap-name">全球化品牌与出海</div>
+        <div class="cap-desc">AI 辅助多语言品牌营销与出海</div>
+      </div>
+      <div class="cap-card">
+        <span class="cap-icon">📈</span>
+        <div class="cap-name">AI 驱动增长与获客</div>
+        <div class="cap-desc">跑通 SEO / 投放 / 私域全链路</div>
+      </div>
+      <div class="cap-card">
+        <span class="cap-icon">📊</span>
+        <div class="cap-name">智能决策与业务洞察</div>
+        <div class="cap-desc">AI 数据分析，让决策有据可依</div>
+      </div>
+      <div class="cap-card">
+        <span class="cap-icon">✨</span>
+        <div class="cap-name">复杂业务定制</div>
+        <div class="cap-desc">企业级 AI 落地方案定制与交付</div>
+      </div>
+    </div>
+  </div>
+
+ 
+
+  <div class="section-divider"></div>
+
+  <!-- TESTIMONIALS -->
+  <div class="section">
+    <div class="section-label">来自企业的反馈</div>
+    <div class="section-title">他们这样描述 OPC x AI</div>
+
+    <div class="testimonials">
+      <div class="testimonial">
+        <div class="testimonial-avatar">张</div>
+        <div class="testimonial-content">
+          <div class="testimonial-quote">以前找外包最怕踩坑，OPC 的评分报告让我看清楚这个人真的会做什么，不是靠包装出来的简历。发布需求两天就确定合作了。</div>
+          <div class="testimonial-meta">
+            <span class="testimonial-name">张总</span>
+            <span class="testimonial-role">某初创消费品品牌 · 创始人</span>
+            <span class="testimonial-stars">★★★★★</span>
+          </div>
+        </div>
+      </div>
+      <div class="testimonial">
+        <div class="testimonial-avatar" style="background: linear-gradient(135deg, #f59e0b, #d97706);">李</div>
+        <div class="testimonial-content">
+          <div class="testimonial-quote">我们需要搭建 AI 数据看板，平台精准匹配了一个有数据和工作流双背景的 OPC，一周内完成交付，比招全职省多了。</div>
+          <div class="testimonial-meta">
+            <span class="testimonial-name">李经理</span>
+            <span class="testimonial-role">某智能制造企业 · 运营负责人</span>
+            <span class="testimonial-stars">★★★★★</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider"></div>
+
+  <!-- CTA -->
+  <div class="cta-block">
+    <div class="cta-eyebrow">立即开始</div>
+    <h2 class="cta-title">
+      准备好了吗？<br>
+      <span>让 AI 帮你找到对的人</span>
+    </h2>
+    <p class="cta-sub">
+      2 步完成注册，发布第一个需求，AI 立即开始为你匹配。<br>
+      首批企业完全免费，无任何隐性收费。
+    </p>
+
+    <div class="cta-buttons">
+      <a class="btn-primary" href="https://opcxai.com/register/corp">
+        🏢 免费入驻，发布需求
+      </a>
+      <a class="btn-secondary" href="https://opcxai.com/corp/market">
+        浏览 OPC 人才市场 →
+      </a>
+    </div>
+
+    <div class="qr-container">
+      <div class="qr-code">
+        <img src="qr.png" alt="扫码入驻">
+      </div>
+      <div class="qr-hint">扫码入驻</div>
+    </div>
+
+    <div class="cta-url"><span>opcxai.com</span> · 现已开放企业入驻</div>
+    <div class="cta-fine">⏳ 首批免费名额有限 · 极简 2 步注册</div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="poster-footer">
+    <div class="footer-logo">OPC<span> x AI</span></div>
+    <div class="footer-copy">© 2026 OPC x AI · 基于 AI 实战胜任力认证的超级个体匹配平台</div>
+  </div>
+
+</div>
+
+
+</body>
+</html>

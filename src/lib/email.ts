@@ -1,64 +1,54 @@
 import nodemailer from "nodemailer";
-
-// ─── In-memory verification code store ───────────────────────────────────────
-// Maps email → { code, expiresAt }
-// Note: this is process-level memory; works for single-instance deployments.
-
-interface CodeEntry {
-  code: string;
-  expiresAt: number; // Unix ms
-}
-
-const codeStore = new Map<string, CodeEntry>();
-
-// Clean up expired entries periodically
-setInterval(() => {
-  const now = Date.now();
-  for (const [email, entry] of codeStore.entries()) {
-    if (entry.expiresAt < now) codeStore.delete(email);
-  }
-}, 60_000);
+import { prisma } from "@/lib/db";
 
 // ─── Generate & store a 6-digit code ─────────────────────────────────────────
-export function generateVerifyCode(email: string): string {
+export async function generateVerifyCode(email: string): Promise<string> {
   const code = String(Math.floor(100000 + Math.random() * 900000));
-  codeStore.set(email, { code, expiresAt: Date.now() + 5 * 60 * 1000 });
+  const expiresAt = new Date(Date.now() + 5 * 60 * 1000);
+
+  await prisma.emailVerification.upsert({
+    where: { email },
+    create: { email, code, expires_at: expiresAt },
+    update: { code, expires_at: expiresAt, verified: false },
+  });
+
   return code;
 }
 
 // ─── Verify a code ────────────────────────────────────────────────────────────
-export function checkVerifyCode(email: string, input: string): boolean {
-  const entry = codeStore.get(email);
-  if (!entry) return false;
-  if (entry.expiresAt < Date.now()) {
-    codeStore.delete(email);
-    return false;
-  }
+export async function checkVerifyCode(email: string, input: string): Promise<boolean> {
+  const entry = await prisma.emailVerification.findUnique({ where: { email } });
+  if (!entry || entry.verified) return false;
+  if (entry.expires_at < new Date()) return false;
   if (entry.code !== input) return false;
-  codeStore.delete(email); // consume code on success
+
+  await prisma.emailVerification.update({
+    where: { email },
+    data: { verified: true },
+  });
+
   return true;
 }
 
-// ─── Mark email as verified (after successful check) ─────────────────────────
-// We reuse the store: successful verification sets a special marker valid 10 min
-const verifiedStore = new Map<string, number>(); // email → expiresAt
-
-export function markEmailVerified(email: string) {
-  verifiedStore.set(email, Date.now() + 10 * 60 * 1000);
+// ─── Mark email as verified ─────────────────────────────────────────────────
+export async function markEmailVerified(email: string): Promise<void> {
+  const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+  await prisma.emailVerification.upsert({
+    where: { email },
+    create: { email, code: "", verified: true, expires_at: expiresAt },
+    update: { verified: true, expires_at: expiresAt },
+  });
 }
 
-export function isEmailVerified(email: string): boolean {
-  const exp = verifiedStore.get(email);
-  if (!exp) return false;
-  if (exp < Date.now()) {
-    verifiedStore.delete(email);
-    return false;
-  }
+export async function isEmailVerified(email: string): Promise<boolean> {
+  const entry = await prisma.emailVerification.findUnique({ where: { email } });
+  if (!entry || !entry.verified) return false;
+  if (entry.expires_at < new Date()) return false;
   return true;
 }
 
-export function consumeEmailVerified(email: string) {
-  verifiedStore.delete(email);
+export async function consumeEmailVerified(email: string): Promise<void> {
+  await prisma.emailVerification.delete({ where: { email } }).catch(() => {});
 }
 
 // ─── Send code via SMTP ───────────────────────────────────────────────────────
