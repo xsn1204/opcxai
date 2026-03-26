@@ -48,7 +48,7 @@ export async function POST() {
   }
 
   try {
-    const code = generateVerifyCode(user.email);
+    const code = await generateVerifyCode(user.email);
     await sendResetPasswordEmail(user.email, code);
     // Return masked email so client can display it
     const [local, domain] = user.email.split("@");
