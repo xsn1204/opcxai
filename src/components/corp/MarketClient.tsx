@@ -115,7 +115,7 @@ function IndividualCard({
       {/* Capability tags */}
       {capMods.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-3">
-          {capMods.slice(0, 3).map((modId) => {
+          {capMods.map((modId) => {
             const mod = moduleLabels[modId];
             return (
               <span
@@ -126,11 +126,6 @@ function IndividualCard({
               </span>
             );
           })}
-          {capMods.length > 3 && (
-            <span className="text-[10px] text-slate-400 self-center">
-              +{capMods.length - 3}
-            </span>
-          )}
         </div>
       )}
 
@@ -141,7 +136,7 @@ function IndividualCard({
             工具栈
           </p>
           <div className="flex flex-wrap gap-1">
-            {tools.slice(0, 4).map((t) => (
+            {tools.map((t) => (
               <span
                 key={t}
                 className="text-[10px] font-mono bg-white text-slate-500 px-1.5 py-0.5 rounded border border-slate-200"
@@ -149,11 +144,6 @@ function IndividualCard({
                 {t}
               </span>
             ))}
-            {tools.length > 4 && (
-              <span className="text-[10px] text-slate-400 self-center">
-                +{tools.length - 4}
-              </span>
-            )}
           </div>
         </div>
       )}
@@ -213,9 +203,9 @@ function EnterpriseCard({
               机构OPC
             </span>
           </div>
-          {bioData.team_size && (
+          {bioData.opc_intro && (
             <p className="text-[11px] text-slate-400 font-medium mb-2">
-              👥 {TEAM_SIZE_LABEL[bioData.team_size] ?? bioData.team_size} · 专业交付机构
+              ⚡ {bioData.opc_intro}
             </p>
           )}
           {/* Score + collab badge */}
@@ -236,7 +226,7 @@ function EnterpriseCard({
       {/* Infra — like capability tags */}
       {Array.isArray(bioData.infra) && bioData.infra.length > 0 && (
         <div className="flex flex-wrap gap-1 mb-3">
-          {bioData.infra.slice(0, 3).map((chip) => (
+          {bioData.infra.map((chip) => (
             <span
               key={chip}
               className="text-[10px] bg-slate-50 text-slate-600 px-2 py-0.5 rounded-md border border-slate-100"
@@ -244,11 +234,6 @@ function EnterpriseCard({
               {INFRA_LABEL[chip] ?? chip}
             </span>
           ))}
-          {bioData.infra.length > 3 && (
-            <span className="text-[10px] text-slate-400 self-center">
-              +{bioData.infra.length - 3}
-            </span>
-          )}
         </div>
       )}
 
@@ -257,7 +242,7 @@ function EnterpriseCard({
         <div className="bg-amber-50 rounded-xl p-3 mb-4">
           <p className="text-[9px] text-amber-400 font-bold uppercase mb-2">支持服务</p>
           <div className="flex flex-wrap gap-1">
-            {bioData.business_tags.slice(0, 4).map((tag) => (
+            {bioData.business_tags.map((tag) => (
               <span
                 key={tag}
                 className="text-[10px] font-mono bg-white text-amber-700 px-1.5 py-0.5 rounded border border-amber-100"
@@ -265,11 +250,6 @@ function EnterpriseCard({
                 {BIZ_TAG_LABEL[tag] ?? tag}
               </span>
             ))}
-            {bioData.business_tags.length > 4 && (
-              <span className="text-[10px] text-amber-400 self-center">
-                +{bioData.business_tags.length - 4}
-              </span>
-            )}
           </div>
         </div>
       )}
